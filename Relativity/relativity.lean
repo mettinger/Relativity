@@ -1,5 +1,7 @@
-import Mathlib.Data.Set.Basic
 import Mathlib
+
+--import Mathlib.Data.Real.Sqrt
+--#check Real.sqrt 4
 
 set_option diagnostics true
 --set_option diagnostics.threshold 80
@@ -11,6 +13,7 @@ structure Point4 where
   z : ℝ
   t : ℝ
 
+-- spatial project of 4d point
 @[ext]
 structure Point3 where
   x : ℝ
@@ -48,6 +51,9 @@ def IOb (m : B) := IB m ∧ Ob m -- Define inertial observers
 
 def events (m : B) (x : Point4) : Set B := { b | W m b x } -- events observed by m at x
 
+def wl (m b : B) : Set Point4 := {x | W m b x}
+
+
 -- AXIOM 1: "For any inertial observer, the speed of light is the same everywhere and in every direction, and it is finite. Furthermore, it is possible to send out a light signal in any direction."
 
 def AxPh : Prop := ∀ (m : B), ∃ (c : ℝ), ∀ (x y : Point4), IOb m →
@@ -81,3 +87,8 @@ def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p zeroCoord
 
 axiom axsmb : AxSmB
 -- END AXIOM
+
+
+def NoFasterThanLight : Prop := ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceNormSq y x < abs (pointTime y - pointTime x)
+
+theorem noFasterThanLight : NoFasterThanLight := by sorry
