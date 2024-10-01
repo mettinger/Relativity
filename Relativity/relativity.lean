@@ -41,21 +41,19 @@ def unit4 : Point4 where
   z := 0
   t := 1
 
-opaque U : Type
-opaque B : Type -- Bodies
-opaque IB : B → Prop -- Inertial bodies predicate
-opaque Ph : B → Prop -- Photon predicate
-opaque W : B → B → Point4 → Prop -- Worldview
+axiom B : Type -- Bodies
+axiom IB : B → Prop -- Inertial bodies predicate
+axiom Ph : B → Prop -- Photon predicate
+axiom W : B → B → Point4 → Prop -- Worldview
 
 
-def Ob (m : B) := ∃ (b : B) (pt : Point4 ) , W m b pt -- Define observers
+def Ob (m : B) : Prop := ∃ (b : B) (pt : Point4 ) , W m b pt -- Define observer predicate
 
-def IOb (m : B) := IB m ∧ Ob m -- Define inertial observers
+def IOb (m : B) : Prop := IB m ∧ Ob m -- Define inertial observer predicate
 
 def events (m : B) (x : Point4) : Set B := { b | W m b x } -- events observed by m at x
 
 def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
-
 
 -- AXIOM 1: "For any inertial observer, the speed of light is the same everywhere and in every direction, and it is finite. Furthermore, it is possible to send out a light signal in any direction."
 
