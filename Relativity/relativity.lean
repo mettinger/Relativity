@@ -87,4 +87,4 @@ axiom axsmb : AxSmB
 
 def NoFasterThanLight : Prop := ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (y.t - x.t)
 
---theorem noFasterThanLight : NoFasterThanLight := by sorry
+theorem noFasterThanLight : NoFasterThanLight := by sorry
