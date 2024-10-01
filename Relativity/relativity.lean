@@ -35,7 +35,7 @@ def origin4 : Point4 where
   z := 0
   t := 0
 
-def unit4 : Point4 where
+def xLightYear4 : Point4 where
   x := 1
   y := 0
   z := 0
@@ -44,12 +44,12 @@ def unit4 : Point4 where
 axiom B : Type -- Bodies
 axiom IB : B → Prop -- Inertial bodies predicate
 axiom Ph : B → Prop -- Photon predicate
-axiom W : B → B → Point4 → Prop -- Worldview
+axiom W : B → B → Point4 → Prop -- Worldview predicate
 
 
-def Ob (m : B) : Prop := ∃ (b : B) (pt : Point4 ) , W m b pt -- Define observer predicate
+def Ob (m : B) : Prop := ∃ (b : B) (pt : Point4 ) , W m b pt -- Observer predicate
 
-def IOb (m : B) : Prop := IB m ∧ Ob m -- Define inertial observer predicate
+def IOb (m : B) : Prop := IB m ∧ Ob m -- Inertial observer predicate
 
 def events (m : B) (x : Point4) : Set B := { b | W m b x } -- events observed by m at x
 
@@ -83,8 +83,8 @@ def AxSmA : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4),
 axiom axsm : AxSmA
 -- END AXIOM
 
--- AXIOM 4b : "the speed of light is 1 for all observers."
-def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 ∧ W m p unit4
+-- AXIOM 4b : "the speed of light is 1 for all inertial observers."
+def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 ∧ W m p xLightYear4
 
 axiom axsmb : AxSmB
 -- END AXIOM
