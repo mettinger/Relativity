@@ -1,7 +1,6 @@
 import Mathlib
 
 set_option diagnostics true
---set_option diagnostics.threshold 80
 
 @[ext]
 structure Point4 where
@@ -10,7 +9,7 @@ structure Point4 where
   z : ℝ
   t : ℝ
 
--- spatial project of 4d point
+-- spatial projection of 4d point
 @[ext]
 structure Point3 where
   x : ℝ
@@ -18,7 +17,7 @@ structure Point3 where
   z : ℝ
 
 def point4ToSpace (p : Point4) : Point3 := Point3.mk p.x p.y p.z
-def point4ToTime (p : Point4) : ℝ := p.t
+--def point4ToTime (p : Point4) : ℝ := p.t
 def pointSpaceMinus (p q: Point3): Point3 := Point3.mk (p.x - q.x) (p.y - q.y) (p.z - q.z)
 noncomputable def spaceNorm (p : Point3) : ℝ := Real.sqrt (p.x ^ 2 + p.y ^ 2 + p.z ^ 2)
 noncomputable def spaceDistance (p q : Point4) : ℝ := spaceNorm (pointSpaceMinus (point4ToSpace p) (point4ToSpace q))
@@ -54,7 +53,7 @@ def wl (m b : B) : Set Point4 := {x | W m b x}
 -- AXIOM 1: "For any inertial observer, the speed of light is the same everywhere and in every direction, and it is finite. Furthermore, it is possible to send out a light signal in any direction."
 
 def AxPh : Prop := ∀ (m : B), ∃ (c : ℝ), ∀ (x y : Point4), IOb m →
-  (∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistance x y = c * (abs (point4ToTime y - point4ToTime x)) ^ 2)
+  (∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistance x y = c * (abs (y.t - x.t)) ^ 2)
 
 axiom axph : AxPh
 -- END AXIOM
@@ -74,7 +73,7 @@ axiom axsf : AxSf
 
 -- AXIOM 4a : " Any two inertial observers agree as to the spatial distance between two events if these two events are simultaneous for both of them."
 
-def AxSmA : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (point4ToTime x = point4ToTime y) ∧ (point4ToTime x' = point4ToTime y') ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistance x y = spaceDistance x' y'
+def AxSmA : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x.t = y.t) ∧ (x'.t = y'.t) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistance x y = spaceDistance x' y'
 
 axiom axsm : AxSmA
 -- END AXIOM
@@ -86,6 +85,6 @@ axiom axsmb : AxSmB
 -- END AXIOM
 
 
-def NoFasterThanLight : Prop := ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (point4ToTime y - point4ToTime x)
+def NoFasterThanLight : Prop := ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (y.t - x.t)
 
 theorem noFasterThanLight : NoFasterThanLight := by sorry
