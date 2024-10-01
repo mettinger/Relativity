@@ -2,6 +2,7 @@ import Mathlib
 
 set_option diagnostics true
 
+-- 4 dimensional point
 @[ext]
 structure Point4 where
   x : ℝ
@@ -16,19 +17,25 @@ structure Point3 where
   y : ℝ
   z : ℝ
 
+-- project 4d point to its spatial components
 def point4ToSpace (p : Point4) : Point3 := Point3.mk p.x p.y p.z
---def point4ToTime (p : Point4) : ℝ := p.t
+
+-- compute distance between two 3d points
 def pointSpaceMinus (p q: Point3): Point3 := Point3.mk (p.x - q.x) (p.y - q.y) (p.z - q.z)
+
+-- compute the norm of a 3d point
 noncomputable def spaceNorm (p : Point3) : ℝ := Real.sqrt (p.x ^ 2 + p.y ^ 2 + p.z ^ 2)
+
+-- compute the spatial distance between to 4d points
 noncomputable def spaceDistance (p q : Point4) : ℝ := spaceNorm (pointSpaceMinus (point4ToSpace p) (point4ToSpace q))
 
-def zeroCoord : Point4 where
+def origin4 : Point4 where
   x := 0
   y := 0
   z := 0
   t := 0
 
-def oneCoord : Point4 where
+def unit4 : Point4 where
   x := 1
   y := 0
   z := 0
@@ -47,7 +54,7 @@ def IOb (m : B) := IB m ∧ Ob m -- Define inertial observers
 
 def events (m : B) (x : Point4) : Set B := { b | W m b x } -- events observed by m at x
 
-def wl (m b : B) : Set Point4 := {x | W m b x}
+def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
 
 
 -- AXIOM 1: "For any inertial observer, the speed of light is the same everywhere and in every direction, and it is finite. Furthermore, it is possible to send out a light signal in any direction."
@@ -79,7 +86,7 @@ axiom axsm : AxSmA
 -- END AXIOM
 
 -- AXIOM 4b : "the speed of light is 1 for all observers."
-def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p zeroCoord ∧ W m p oneCoord
+def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 ∧ W m p unit4
 
 axiom axsmb : AxSmB
 -- END AXIOM
