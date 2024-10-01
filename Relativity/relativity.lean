@@ -1,8 +1,5 @@
 import Mathlib
 
---import Mathlib.Data.Real.Sqrt
---#check Real.sqrt 4
-
 set_option diagnostics true
 --set_option diagnostics.threshold 80
 
