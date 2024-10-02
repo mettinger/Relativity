@@ -90,8 +90,6 @@ axiom axsmb : AxSmB
 -- END AXIOM
 
 
-
-
 def test1 : ∀ (a b : Prop), (a ∨ b) ∧ ¬ b → a := by
   intros a b h3
   rcases h3 with ⟨h1, h2⟩
@@ -99,14 +97,16 @@ def test1 : ∀ (a b : Prop), (a ∨ b) ∧ ¬ b → a := by
   | inl ha => exact ha
   | inr hb => exfalso; apply h2 hb
 
+#check Iff.mp le_iff_lt_or_eq
 
 def test : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
   intro a b h1
   rcases h1 with ⟨h1, h2⟩
   have h3 : a ≤ b ∨ b < a := le_or_lt _ _
   cases h3 with
-    | inl h3 => sorry
     | inr h3 => assumption
+    | inl h3 => (Iff.mp le_iff_lt_or_eq) h3
+
 
 
 
