@@ -89,7 +89,20 @@ def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 �
 axiom axsmb : AxSmB
 -- END AXIOM
 
+def noFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (y.t - x.t) := by
+  intros m k x y htemp
 
-def NoFasterThanLight : Prop := ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (y.t - x.t)
 
-theorem noFasterThanLight : NoFasterThanLight := by sorry
+  have h1 : x ∈ wl m k := And.left htemp
+  have ktemp : y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k := And.right htemp
+  clear htemp
+  have h2 : y ∈ wl m k := And.left ktemp
+  have htemp: x ≠ y ∧ IOb m ∧ IOb k := And.right ktemp
+  clear ktemp
+  have h3 : x ≠ y := And.left htemp
+  have ktemp : IOb m ∧ IOb k := And.right htemp
+  clear htemp
+  have h4 : IOb m := And.left ktemp
+  have h5 : IOb k := And.right ktemp
+  clear ktemp
+  sorry
