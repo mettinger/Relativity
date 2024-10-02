@@ -89,11 +89,30 @@ def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 �
 axiom axsmb : AxSmB
 -- END AXIOM
 
+
+
+
+def test1 : ∀ (a b : Prop), (a ∨ b) ∧ ¬ b → a := by
+  intros a b h3
+  rcases h3 with ⟨h1, h2⟩
+  cases h1 with
+  | inl ha => exact ha
+  | inr hb => exfalso; apply h2 hb
+
+
+def test : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
+  intro a b h1
+  rcases h1 with ⟨h1, h2⟩
+  have h3 : a ≤ b ∨ b < a := le_or_lt _ _
+  cases h3 with
+    | inl h3 => sorry
+    | inr h3 => assumption
+
+
+
+
 def noFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (y.t - x.t) := by
   intros m k x y h1
 
-  rcases h1 with ⟨h1, h2⟩
-  rcases h2 with ⟨h2, h3⟩
-  rcases h3 with ⟨h3, h4⟩
-  rcases h4 with ⟨h4, h5⟩
+  rcases h1 with ⟨h1, h2, h3, h4, h5⟩
   sorry
