@@ -97,7 +97,6 @@ def test1 : ∀ (a b : Prop), (a ∨ b) ∧ ¬ b → a := by
   | inl ha => exact ha
   | inr hb => exfalso; apply h2 hb
 
-#check Iff.mp le_iff_lt_or_eq
 
 def test : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
   intro a b h1
@@ -105,10 +104,10 @@ def test : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
   have h3 : a ≤ b ∨ b < a := le_or_lt _ _
   cases h3 with
     | inr h3 => assumption
-    | inl h3 => (Iff.mp le_iff_lt_or_eq) h3
-
-
-
+    | inl h3 => have h4 : (a < b ∨ a = b) := (Iff.mp le_iff_lt_or_eq) h3
+                cases h4 with
+                  | inr h5 => exfalso; apply h2 h5
+                  | inl h5 => exfalso; apply h1 h5
 
 
 def noFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (y.t - x.t) := by
