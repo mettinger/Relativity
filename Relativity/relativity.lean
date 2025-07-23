@@ -90,7 +90,7 @@ axiom axsmb : AxSmB
 -- END AXIOM
 
 
-def myInequality : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
+def myInequalityImplication : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
   intro a b h1
   rcases h1 with ⟨h1, h2⟩
   have h3 : a ≤ b ∨ b < a := le_or_lt _ _
@@ -106,8 +106,11 @@ def noFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y �
   intros m k x y h1
 
   rcases h1 with ⟨h1, h2, h3, h4, h5⟩
-  apply myInequality
-  apply And.intro
+  apply myInequalityImplication
+  constructor
+  sorry
+  sorry
+
 
 
 
