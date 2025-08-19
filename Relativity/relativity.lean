@@ -65,13 +65,13 @@ axiom axph : AxPh
 
 
 -- AXIOM 2: "All inertial observers coordinatize the same set of events."
-def AxEv : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x : Point4), ∃ (y : Point4), events m x = events k y
+def AxEv : Prop := ∀ (m k : B), IOb m → IOb k → ∀ (x : Point4), ∃ (y : Point4), events m x = events k y
 
 axiom axev : AxEv
 -- END AXIOM
 
 -- AXIOM 3: "Any inertial observer sees himself as standing still at the origin."
-def AxSf : Prop := ∀ (m : B), IOb m → ∀ (x : Point4), W m m x ↔ x.x = 0 ∧ x.y = 0 ∧ x.z = 0
+def AxSf : Prop := ∀ (m : B), IOb m → ∀ (x : Point4), W m m x → x.x = 0 ∧ x.y = 0 ∧ x.z = 0
 
 axiom axsf : AxSf
 -- END AXIOM
@@ -86,26 +86,31 @@ axiom axsm : AxSm
 
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistance x y = abs (x.t - y.t) := by
   intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
-  have  ⟨p1, ⟨p1ph, mp1x, mp1y⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
+  have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
+  have pEVmx : p ∈ events m x := by
+    rw [events]
+    exact mpx
+  have pEVmy : p ∈ events m y := by
+    rw [events]
+    exact mpy
+  have ⟨x', EVmxeqkx'⟩ := axev m k iom iok x
+  have ⟨y', EVmyeqky'⟩ := axev m k iom iok y
+  have EVneq1 : events m x ≠ events m y := by sorry
+  have EVneq2 : events k x' ≠ events k y' := by sorry
+  have x'neqy' : x' ≠ y' := sorry
+  let x's : Point3 := point4ToSpace x'
+  let y's : Point3 := point4ToSpace y'
+  have x'sZero : x's = Point3.mk 0 0 0 := by sorry
+  have y'sZero : y's = Point3.mk 0 0 0 := by sorry
+  have x'teqy't : x'.t = y'.t := by sorry
+  have h : x' = y' := by
+    ext
+    case t := x'teqy't
+    case x := by sorry
+    case y := by sorry
+    case z := by sorry
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  contradiction
 
 
 #exit
