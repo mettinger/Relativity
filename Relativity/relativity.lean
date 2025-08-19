@@ -1,6 +1,6 @@
 import Mathlib
 
-set_option diagnostics true
+--set_option diagnostics true
 
 -- 4 dimensional point
 @[ext]
@@ -45,7 +45,7 @@ axiom B : Type -- Bodies
 axiom IB : B → Prop -- Inertial bodies predicate
 axiom Ph : B → Prop -- Photon predicate
 axiom W : B → B → Point4 → Prop -- Worldview predicate
-
+axiom m : B
 
 def Ob (m : B) : Prop := ∃ (b : B) (pt : Point4 ) , W m b pt -- Observer predicate
 
@@ -57,8 +57,8 @@ def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
 
 -- AXIOM 1: "For any inertial observer, the speed of light is the same everywhere and in every direction, and it is finite. Furthermore, it is possible to send out a light signal in any direction."
 
-def AxPh : Prop := ∀ (m : B), ∃ (c : ℝ), ∀ (x y : Point4), IOb m →
-  (∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistance x y = c * (abs (y.t - x.t)) ^ 2)
+def AxPh : Prop := ∀ (m : B), ∀ (x y : Point4), IOb m →
+  ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistance x y = abs (x.t - y.t)))
 
 axiom axph : AxPh
 -- END AXIOM
@@ -78,17 +78,42 @@ axiom axsf : AxSf
 
 -- AXIOM 4a : " Any two inertial observers agree as to the spatial distance between two events if these two events are simultaneous for both of them."
 
-def AxSmA : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x.t = y.t) ∧ (x'.t = y'.t) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistance x y = spaceDistance x' y'
+def AxSm : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x.t = y.t) ∧ (x'.t = y'.t) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistance x y = spaceDistance x' y'
 
-axiom axsm : AxSmA
+axiom axsm : AxSm
 -- END AXIOM
 
+
+theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistance x y = abs (x.t - y.t) := by
+  intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
+  have  ⟨p1, ⟨p1ph, mp1x, mp1y⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#exit
 -- AXIOM 4b : "the speed of light is 1 for all inertial observers."
-def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 ∧ W m p xLightYear4
+--def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 ∧ W m p xLightYear4
 
-axiom axsmb : AxSmB
+--axiom axsmb : AxSmB
 -- END AXIOM
-
 
 def myInequalityImplication : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
   intro a b h1
@@ -110,17 +135,3 @@ def noFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y �
   constructor
   sorry
   sorry
-
-
-
-
-
-/-
-def test1 : ∀ (a b : Prop), (a ∨ b) ∧ ¬ b → a := by
-  intros a b h3
-  rcases h3 with ⟨h1, h2⟩
-  cases h1 with
-  | inl ha => exact ha
-  | inr hb => exfalso; apply h2 hb
-
--/
