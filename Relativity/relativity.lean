@@ -47,11 +47,8 @@ axiom Ph : B → Prop -- Photon predicate
 axiom W : B → B → Point4 → Prop -- Worldview predicate
 
 def Ob (m : B) : Prop := ∃ (b : B) (pt : Point4 ) , W m b pt -- Observer predicate
-
 def IOb (m : B) : Prop := IB m ∧ Ob m -- Inertial observer predicate
-
 def events (m : B) (x : Point4) : Set B := { b | W m b x } -- events observed by m at x
-
 def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
 
 -- AXIOM 1: "For any inertial observer, the speed of light is the same everywhere and in every direction, and it is finite. Furthermore, it is possible to send out a light signal in any direction."
@@ -83,6 +80,12 @@ axiom axsm : AxSm
 -- END AXIOM
 
 
+
+theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : Point4), b ∈ events ob x ↔ W ob b x := by
+  intro b ob x
+  rw [events]
+  simp
+
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistance x y = abs (x.t - y.t) := by
   intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
   have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
@@ -94,15 +97,36 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
     exact mpy
   have ⟨x', EVmxeqkx'⟩ := axev m k iom iok x
   have ⟨y', EVmyeqky'⟩ := axev m k iom iok y
+
   have EVneq1 : events m x ≠ events m y := by sorry
   have EVneq2 : events k x' ≠ events k y' := by sorry
+
   have x'neqy' : x' ≠ y' := sorry
   let x's : Point3 := point4ToSpace x'
   let y's : Point3 := point4ToSpace y'
   have x'sZero : x's = Point3.mk 0 0 0 := by
+    have  : W k k x' := by
+      rw [← eventsToWorldview]
+      rw [← EVmxeqkx']
+      rw [eventsToWorldview]
+      exact mkx
+    have := axsf k iok x' this
+    simp [x's]
+    unfold point4ToSpace
+    simp
+    exact this
 
-  have y'sZero : y's = Point3.mk 0 0 0 := by sorry
-
+  have y'sZero : y's = Point3.mk 0 0 0 := by
+    have  : W k k y' := by
+      rw [← eventsToWorldview]
+      rw [← EVmyeqky']
+      rw [eventsToWorldview]
+      exact mky
+    have := axsf k iok y' this
+    simp [y's]
+    unfold point4ToSpace
+    simp
+    exact this
 
   have x'teqy't : x'.t = y'.t := by
     #check eq_of_abs_sub_eq_zero
