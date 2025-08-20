@@ -144,7 +144,6 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
     exact this
 
 
-
   have x'teqy't : x'.t = y'.t := by
     #check eq_of_abs_sub_eq_zero
     sorry
