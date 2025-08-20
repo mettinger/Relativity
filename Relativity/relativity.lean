@@ -106,7 +106,12 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
   have h : x' = y' := by
     ext
     case t := x'teqy't
-    case x := by sorry
+    case x := by
+      have x's.xZero : x's.x = 0 := by
+        rw [x'sZero]
+      have y's.xZero : y's.x = 0 := by
+        rw [y'sZero]
+
     case y := by sorry
     case z := by sorry
 
