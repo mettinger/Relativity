@@ -146,44 +146,76 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
     simp
     exact this
 
+  have spacedistSqx'y'0 : spaceDistanceSq x' y' = 0 := by
+    unfold spaceDistanceSq
+    change spaceNormSq (pointSpaceMinus x's y's) = 0
+    have hdiff : pointSpaceMinus x's y's = Point3.mk 0 0 0 := by
+      rw [x'sZero, y'sZero]
+      simp [pointSpaceMinus]
+    rw [hdiff]
+    simp [spaceNormSq]
 
   have x'teqy't : x'.t = y'.t := by
-    #check eq_of_abs_sub_eq_zero
-    sorry
+    have pEVkx' : p ∈ events k x' := by
+      rw [← EVmxeqkx']
+      exact pEVmx
+    have pEVky' : p ∈ events k y' := by
+      rw [← EVmyeqky']
+      exact pEVmy
+    have pWkx' : W k p x' := (eventsToWorldview p k x').mp pEVkx'
+    have pWky' : W k p y' := (eventsToWorldview p k y').mp pEVky'
+    have photon_k : ∃ p₀, Ph p₀ ∧ W k p₀ x' ∧ W k p₀ y' := ⟨p, pph, pWkx', pWky'⟩
+    have lightspeed_k : spaceDistanceSq x' y' = abs (x'.t - y'.t) ^ 2 :=
+      (axph k x' y' iok).mp photon_k
+    have h0 : 0 = abs (x'.t - y'.t) ^ 2 :=
+      Eq.trans spacedistSqx'y'0.symm lightspeed_k
+    have habs0 : abs (x'.t - y'.t) ^ 2 = 0 := h0.symm
+    have habs : abs (x'.t - y'.t) = 0 := by
+      have : abs (x'.t - y'.t) * abs (x'.t - y'.t) = 0 := by
+        simpa [pow_two] using habs0
+      exact mul_self_eq_zero.mp this
+    have diff0 : x'.t - y'.t = 0 := abs_eq_zero.mp habs
+    exact sub_eq_zero.mp diff0
 
   have x'eqy' : x' = y' := by
     ext
     case t := x'teqy't
     case x := by
-      have x's.xZero : x's.x = 0 := by
-        rw [x'sZero]
-      have y's.xZero : y's.x = 0 := by
-        rw [y'sZero]
       rw [show x'.x = x's.x from rfl]
       rw [show y'.x = y's.x from rfl]
       rw [x'sZero, y'sZero]
     case y := by
-      have x's.xZero : x's.y = 0 := by
-        rw [x'sZero]
-      have y's.xZero : y's.y = 0 := by
-        rw [y'sZero]
       rw [show x'.y = x's.y from rfl]
       rw [show y'.y = y's.y from rfl]
       rw [x'sZero, y'sZero]
     case z := by
-      have x's.xZero : x's.z = 0 := by
-        rw [x'sZero]
-      have y's.xZero : y's.z = 0 := by
-        rw [y'sZero]
       rw [show x'.z = x's.z from rfl]
       rw [show y'.z = y's.z from rfl]
       rw [x'sZero, y'sZero]
   contradiction
 
-
 #exit
+
 -- AXIOM 4b : "the speed of light is 1 for all inertial observers."
 --def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 ∧ W m p xLightYear4
 
 --axiom axsmb : AxSmB
 -- END AXIOM
+
+/-
+      have x's.xZero : x's.x = 0 := by
+        rw [x'sZero]
+      have y's.xZero : y's.x = 0 := by
+        rw [y'sZero]-/
+
+/-
+      have x's.xZero : x's.y = 0 := by
+        rw [x'sZero]
+      have y's.xZero : y's.y = 0 := by
+        rw [y'sZero]-/
+
+        /-
+      have x's.xZero : x's.z = 0 := by
+        rw [x'sZero]
+      have y's.xZero : y's.z = 0 := by
+        rw [y'sZero]-/
