@@ -45,7 +45,6 @@ axiom B : Type -- Bodies
 axiom IB : B → Prop -- Inertial bodies predicate
 axiom Ph : B → Prop -- Photon predicate
 axiom W : B → B → Point4 → Prop -- Worldview predicate
-axiom m : B
 
 def Ob (m : B) : Prop := ∃ (b : B) (pt : Point4 ) , W m b pt -- Observer predicate
 
@@ -100,10 +99,16 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
   have x'neqy' : x' ≠ y' := sorry
   let x's : Point3 := point4ToSpace x'
   let y's : Point3 := point4ToSpace y'
-  have x'sZero : x's = Point3.mk 0 0 0 := by sorry
+  have x'sZero : x's = Point3.mk 0 0 0 := by
+
   have y'sZero : y's = Point3.mk 0 0 0 := by sorry
-  have x'teqy't : x'.t = y'.t := by sorry
-  have h : x' = y' := by
+
+
+  have x'teqy't : x'.t = y'.t := by
+    #check eq_of_abs_sub_eq_zero
+    sorry
+
+  have x'eqy' : x' = y' := by
     ext
     case t := x'teqy't
     case x := by
@@ -111,10 +116,25 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
         rw [x'sZero]
       have y's.xZero : y's.x = 0 := by
         rw [y'sZero]
-
-    case y := by sorry
-    case z := by sorry
-
+      rw [show x'.x = x's.x from rfl]
+      rw [show y'.x = y's.x from rfl]
+      rw [x'sZero, y'sZero]
+    case y := by
+      have x's.xZero : x's.y = 0 := by
+        rw [x'sZero]
+      have y's.xZero : y's.y = 0 := by
+        rw [y'sZero]
+      rw [show x'.y = x's.y from rfl]
+      rw [show y'.y = y's.y from rfl]
+      rw [x'sZero, y'sZero]
+    case z := by
+      have x's.xZero : x's.z = 0 := by
+        rw [x'sZero]
+      have y's.xZero : y's.z = 0 := by
+        rw [y'sZero]
+      rw [show x'.z = x's.z from rfl]
+      rw [show y'.z = y's.z from rfl]
+      rw [x'sZero, y'sZero]
   contradiction
 
 
