@@ -87,11 +87,13 @@ theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : Point4), b ∈ events ob x 
   simp
 
 theorem x_eq_y_eq_events : ∀ (x y : Point4), ∀ (ob : B), x = y → events ob x = events ob y := by
-  intro x y xeqy
-  ext b
+  intro x y ob xeqy
+  ext ob
   unfold events
   simp
   rw [xeqy]
+
+theorem x_ne_y_evx_ne_evy : ∀ (x y : Point4) (b : B), x ≠ y → events b x ≠ events b y := sorry
 
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistanceSq x y = abs (x.t - y.t) ^ 2 := by
   intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
@@ -105,7 +107,8 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
   have ⟨x', EVmxeqkx'⟩ := axev m k iom iok x
   have ⟨y', EVmyeqky'⟩ := axev m k iom iok y
 
-  have EVneq1 : events m x ≠ events m y := by sorry
+  have EVneq1 : events m x ≠ events m y := x_ne_y_evx_ne_evy x y m xney
+
   have EVneq2 : events k x' ≠ events k y' := by
     rw [← EVmxeqkx']
     rw [← EVmyeqky']
