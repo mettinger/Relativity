@@ -79,11 +79,19 @@ def AxSm : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), 
 axiom axsm : AxSm
 -- END AXIOM
 
+--------------------------------------------
 
 theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : Point4), b ∈ events ob x ↔ W ob b x := by
   intro b ob x
   rw [events]
   simp
+
+theorem x_eq_y_eq_events : ∀ (x y : Point4), ∀ (ob : B), x = y → events ob x = events ob y := by
+  intro x y xeqy
+  ext b
+  unfold events
+  simp
+  rw [xeqy]
 
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistanceSq x y = abs (x.t - y.t) ^ 2 := by
   intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
@@ -98,8 +106,15 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
   have ⟨y', EVmyeqky'⟩ := axev m k iom iok y
 
   have EVneq1 : events m x ≠ events m y := by sorry
-  have EVneq2 : events k x' ≠ events k y' := by sorry
-  have x'neqy' : x' ≠ y' := sorry
+  have EVneq2 : events k x' ≠ events k y' := by
+    rw [← EVmxeqkx']
+    rw [← EVmyeqky']
+    exact EVneq1
+  have x'neqy' : x' ≠ y' := by
+    have := x_eq_y_eq_events x' y' k
+    by_contra x'eqy'
+    have EVkx'eqky' := this x'eqy'
+    contradiction
 
   let x's : Point3 := point4ToSpace x'
   let y's : Point3 := point4ToSpace y'
