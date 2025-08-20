@@ -24,10 +24,10 @@ def point4ToSpace (p : Point4) : Point3 := Point3.mk p.x p.y p.z
 def pointSpaceMinus (p q: Point3): Point3 := Point3.mk (p.x - q.x) (p.y - q.y) (p.z - q.z)
 
 -- compute the norm of a 3d point
-noncomputable def spaceNorm (p : Point3) : ℝ := Real.sqrt (p.x ^ 2 + p.y ^ 2 + p.z ^ 2)
+def spaceNormSq (p : Point3) : ℝ := p.x ^ 2 + p.y ^ 2 + p.z ^ 2
 
--- compute the spatial distance between to 4d points
-noncomputable def spaceDistance (p q : Point4) : ℝ := spaceNorm (pointSpaceMinus (point4ToSpace p) (point4ToSpace q))
+-- compute the spatial distance between two 4d points
+def spaceDistanceSq (p q : Point4) : ℝ := spaceNormSq (pointSpaceMinus (point4ToSpace p) (point4ToSpace q))
 
 def origin4 : Point4 where
   x := 0
@@ -54,7 +54,7 @@ def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
 -- AXIOM 1: "For any inertial observer, the speed of light is the same everywhere and in every direction, and it is finite. Furthermore, it is possible to send out a light signal in any direction."
 
 def AxPh : Prop := ∀ (m : B), ∀ (x y : Point4), IOb m →
-  ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistance x y = abs (x.t - y.t)))
+  ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = abs (x.t - y.t) ^2))
 
 axiom axph : AxPh
 -- END AXIOM
@@ -74,11 +74,10 @@ axiom axsf : AxSf
 
 -- AXIOM 4a : " Any two inertial observers agree as to the spatial distance between two events if these two events are simultaneous for both of them."
 
-def AxSm : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x.t = y.t) ∧ (x'.t = y'.t) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistance x y = spaceDistance x' y'
+def AxSm : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x.t = y.t) ∧ (x'.t = y'.t) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistanceSq x y = spaceDistanceSq x' y'
 
 axiom axsm : AxSm
 -- END AXIOM
-
 
 
 theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : Point4), b ∈ events ob x ↔ W ob b x := by
@@ -86,7 +85,7 @@ theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : Point4), b ∈ events ob x 
   rw [events]
   simp
 
-theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistance x y = abs (x.t - y.t) := by
+theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistanceSq x y = abs (x.t - y.t) ^ 2 := by
   intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
   have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
   have pEVmx : p ∈ events m x := by
@@ -100,10 +99,11 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
 
   have EVneq1 : events m x ≠ events m y := by sorry
   have EVneq2 : events k x' ≠ events k y' := by sorry
-
   have x'neqy' : x' ≠ y' := sorry
+
   let x's : Point3 := point4ToSpace x'
   let y's : Point3 := point4ToSpace y'
+
   have x'sZero : x's = Point3.mk 0 0 0 := by
     have  : W k k x' := by
       rw [← eventsToWorldview]
@@ -127,6 +127,8 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
     unfold point4ToSpace
     simp
     exact this
+
+
 
   have x'teqy't : x'.t = y'.t := by
     #check eq_of_abs_sub_eq_zero
@@ -168,24 +170,3 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
 
 --axiom axsmb : AxSmB
 -- END AXIOM
-
-def myInequalityImplication : ∀ (a b : ℝ), ¬ a < b ∧ ¬ a = b → b < a := by
-  intro a b h1
-  rcases h1 with ⟨h1, h2⟩
-  have h3 : a ≤ b ∨ b < a := le_or_lt _ _
-  cases h3 with
-    | inr h3 => assumption
-    | inl h3 => have h4 : (a < b ∨ a = b) := (Iff.mp le_iff_lt_or_eq) h3
-                cases h4 with
-                  | inr h5 => exfalso; apply h2 h5
-                  | inl h5 => exfalso; apply h1 h5
-
-
-def noFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), x ∈ wl m k ∧ y ∈ wl m k ∧ x ≠ y ∧ IOb m ∧ IOb k → spaceDistance y x < abs (y.t - x.t) := by
-  intros m k x y h1
-
-  rcases h1 with ⟨h1, h2, h3, h4, h5⟩
-  apply myInequalityImplication
-  constructor
-  sorry
-  sorry
