@@ -1,8 +1,32 @@
 import Mathlib
+--import Mathlib.Data.Real.Basic
+--import Mathlib.Data.Matrix.Notation
 
 --set_option diagnostics true
 
--- 4 dimensional point
+
+-- Define a scalar 's'
+def s : ℝ := 3
+
+-- Define a vector 'v' in ℝ³ (represented as a function from Fin 3 to ℝ)
+def v : Fin 3 → ℝ := ![1, 5, 2]
+
+-- Perform the scalar multiplication
+def result : Fin 3 → ℝ := s • v
+
+-- The '#eval' command computes and displays the result
+-- The result will be the vector ![3, 15, 6]
+#eval result 0 -- Output: 3
+#eval result 1 -- Output: 15
+#eval result 2 -- Output: 6
+
+#eval v
+
+#exit
+
+def Point4 := Fin 4 → ℝ
+def Point3 := Fin 3 → ℝ
+
 @[ext]
 structure Point4 where
   x : ℝ
