@@ -1,57 +1,22 @@
 import Mathlib
---import Mathlib.Data.Real.Basic
---import Mathlib.Data.Matrix.Notation
-
 --set_option diagnostics true
 
-
--- Define a scalar 's'
-def s : ℝ := 3
-
--- Define a vector 'v' in ℝ³ (represented as a function from Fin 3 to ℝ)
-def v : Fin 3 → ℝ := ![1, 5, 2]
-
--- Perform the scalar multiplication
-def result : Fin 3 → ℝ := s • v
-
--- The '#eval' command computes and displays the result
--- The result will be the vector ![3, 15, 6]
-#eval result 0 -- Output: 3
-#eval result 1 -- Output: 15
-#eval result 2 -- Output: 6
-
-#eval v
-
-#exit
-
-def Point4 := Fin 4 → ℝ
-def Point3 := Fin 3 → ℝ
-
-@[ext]
-structure Point4 where
-  x : ℝ
-  y : ℝ
-  z : ℝ
-  t : ℝ
-
--- spatial projection of 4d point
-@[ext]
-structure Point3 where
-  x : ℝ
-  y : ℝ
-  z : ℝ
+abbrev Point4 : Type := Fin 4 → ℝ
+abbrev Point3 : Type := Fin 3 → ℝ
 
 -- project 4d point to its spatial components
-def point4ToSpace (p : Point4) : Point3 := Point3.mk p.x p.y p.z
-
--- compute distance between two 3d points
-def pointSpaceMinus (p q: Point3): Point3 := Point3.mk (p.x - q.x) (p.y - q.y) (p.z - q.z)
+def point4ToSpace (p : Point4) : Point3 :=
+  fun x : Fin 3 =>
+    match x with
+    | 0 => p 0
+    | 1 => p 1
+    | 2 => p 2
 
 -- compute the norm of a 3d point
-def spaceNormSq (p : Point3) : ℝ := p.x ^ 2 + p.y ^ 2 + p.z ^ 2
+def spaceNormSq (p : Point3) : ℝ := p 0 ^ 2 + p 1 ^ 2 + p 2 ^ 2
 
 -- compute the spatial distance between two 4d points
-def spaceDistanceSq (p q : Point4) : ℝ := spaceNormSq (pointSpaceMinus (point4ToSpace p) (point4ToSpace q))
+def spaceDistanceSq (p q : Point4) : ℝ := spaceNormSq ((point4ToSpace p) - (point4ToSpace q))
 
 axiom B : Type -- Bodies
 axiom IB : B → Prop -- Inertial bodies predicate
@@ -66,7 +31,7 @@ def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
 -- AXIOM 1: "For any inertial observer, the speed of light is 1. Furthermore, it is possible to send out a light signal in any direction."
 
 def AxPh : Prop := ∀ (m : B), ∀ (x y : Point4), IOb m →
-  ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = abs (x.t - y.t) ^2))
+  ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = abs (x 3 - y 3) ^2))
 
 axiom axph : AxPh
 -- END AXIOM
@@ -79,14 +44,14 @@ axiom axev : AxEv
 -- END AXIOM
 
 -- AXIOM 3: "Any inertial observer sees himself as standing still at the origin."
-def AxSf : Prop := ∀ (m : B), IOb m → ∀ (x : Point4), W m m x → x.x = 0 ∧ x.y = 0 ∧ x.z = 0
+def AxSf : Prop := ∀ (m : B), IOb m → ∀ (x : Point4), W m m x → x 0 = 0 ∧ x 1 = 0 ∧ x 2 = 0
 
 axiom axsf : AxSf
 -- END AXIOM
 
 -- AXIOM 4 : " Any two inertial observers agree as to the spatial distance between two events if these two events are simultaneous for both of them."
 
-def AxSm : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x.t = y.t) ∧ (x'.t = y'.t) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistanceSq x y = spaceDistanceSq x' y'
+def AxSm : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x 3 = y 3) ∧ (x' 3 = y' 3) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistanceSq x y = spaceDistanceSq x' y'
 
 axiom axsm : AxSm
 -- END AXIOM
@@ -113,12 +78,7 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : Point4) (b : B), x ≠ y → events b x �
   sorry
 
 
-
-
-
-
-
-theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistanceSq x y = abs (x.t - y.t) ^ 2 := by
+theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by
   intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
   have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
   have pEVmx : p ∈ events m x := by
@@ -145,7 +105,7 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
   let x's : Point3 := point4ToSpace x'
   let y's : Point3 := point4ToSpace y'
 
-  have x'sZero : x's = Point3.mk 0 0 0 := by
+  have x'sZero : x's = ![0, 0, 0] := by
     have  : W k k x' := by
       rw [← eventsToWorldview]
       rw [← EVmxeqkx']
@@ -155,9 +115,10 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
     simp [x's]
     unfold point4ToSpace
     simp
-    exact this
+    simp [this]
+    aesop
 
-  have y'sZero : y's = Point3.mk 0 0 0 := by
+  have y'sZero : y's = ![0, 0, 0] := by
     have  : W k k y' := by
       rw [← eventsToWorldview]
       rw [← EVmyeqky']
@@ -167,18 +128,18 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
     simp [y's]
     unfold point4ToSpace
     simp
-    exact this
+    simp [this]
+    aesop
 
   have spacedistSqx'y'0 : spaceDistanceSq x' y' = 0 := by
     unfold spaceDistanceSq
-    change spaceNormSq (pointSpaceMinus x's y's) = 0
-    have hdiff : pointSpaceMinus x's y's = Point3.mk 0 0 0 := by
-      rw [x'sZero, y'sZero]
-      simp [pointSpaceMinus]
-    rw [hdiff]
-    simp [spaceNormSq]
+    change spaceNormSq (x's - y's) = 0
+    rw [x'sZero, y'sZero]
+    simp
+    unfold spaceNormSq
+    simp
 
-  have x'teqy't : x'.t = y'.t := by
+  have x'teqy't : x' 3 = y' 3 := by
     have pEVkx' : p ∈ events k x' := by
       rw [← EVmxeqkx']
       exact pEVmx
@@ -188,55 +149,38 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y �
     have pWkx' : W k p x' := (eventsToWorldview p k x').mp pEVkx'
     have pWky' : W k p y' := (eventsToWorldview p k y').mp pEVky'
     have photon_k : ∃ p₀, Ph p₀ ∧ W k p₀ x' ∧ W k p₀ y' := ⟨p, pph, pWkx', pWky'⟩
-    have lightspeed_k : spaceDistanceSq x' y' = abs (x'.t - y'.t) ^ 2 :=
+    have lightspeed_k : spaceDistanceSq x' y' = abs (x' 3 - y' 3) ^ 2 :=
       (axph k x' y' iok).mp photon_k
-    have h0 : 0 = abs (x'.t - y'.t) ^ 2 :=
+    have h0 : 0 = abs (x' 3 - y' 3) ^ 2 :=
       Eq.trans spacedistSqx'y'0.symm lightspeed_k
-    have habs0 : abs (x'.t - y'.t) ^ 2 = 0 := h0.symm
-    have habs : abs (x'.t - y'.t) = 0 := by
-      have : abs (x'.t - y'.t) * abs (x'.t - y'.t) = 0 := by
+    have habs0 : abs (x' 3 - y' 3) ^ 2 = 0 := h0.symm
+    have habs : abs (x' 3 - y' 3) = 0 := by
+      have : abs (x' 3 - y' 3) * abs (x' 3 - y' 3) = 0 := by
         simpa [pow_two] using habs0
       exact mul_self_eq_zero.mp this
-    have diff0 : x'.t - y'.t = 0 := abs_eq_zero.mp habs
+    have diff0 : x' 3 - y' 3 = 0 := abs_eq_zero.mp habs
     exact sub_eq_zero.mp diff0
 
   have x'eqy' : x' = y' := by
-    ext
-    case t := x'teqy't
-    case x := by
-      rw [show x'.x = x's.x from rfl]
-      rw [show y'.x = y's.x from rfl]
-      rw [x'sZero, y'sZero]
-    case y := by
-      rw [show x'.y = x's.y from rfl]
-      rw [show y'.y = y's.y from rfl]
-      rw [x'sZero, y'sZero]
-    case z := by
-      rw [show x'.z = x's.z from rfl]
-      rw [show y'.z = y's.z from rfl]
-      rw [x'sZero, y'sZero]
+    have hx0 : x' 0 = 0 := by
+      have h := congrArg (fun f => f 0) x'sZero
+      simpa [point4ToSpace] using h
+    have hx1 : x' 1 = 0 := by
+      have h := congrArg (fun f => f 1) x'sZero
+      simpa [point4ToSpace] using h
+    have hx2 : x' 2 = 0 := by
+      have h := congrArg (fun f => f 2) x'sZero
+      simpa [point4ToSpace] using h
+    have hy0 : y' 0 = 0 := by
+      have h := congrArg (fun f => f 0) y'sZero
+      simpa [point4ToSpace] using h
+    have hy1 : y' 1 = 0 := by
+      have h := congrArg (fun f => f 1) y'sZero
+      simpa [point4ToSpace] using h
+    have hy2 : y' 2 = 0 := by
+      have h := congrArg (fun f => f 2) y'sZero
+      simpa [point4ToSpace] using h
+    ext i
+    fin_cases i <;> simp [hx0, hx1, hx2, hy0, hy1, hy2, x'teqy't]
+
   contradiction
-
--- AXIOM 4b : "the speed of light is 1 for all inertial observers."
---def AxSmB : Prop := ∀ (m : B), IOb m → ∃ (p : B), Ph p ∧ W m p origin4 ∧ W m p xLightYear4
-
---axiom axsmb : AxSmB
--- END AXIOM
-
-/-
-      have x's.xZero : x's.x = 0 := by
-        rw [x'sZero]
-      have y's.xZero : y's.x = 0 := by
-        rw [y'sZero]-/
-
-/-
-      have x's.xZero : x's.y = 0 := by
-        rw [x'sZero]
-      have y's.xZero : y's.y = 0 := by
-        rw [y'sZero]-/
-
-        /-
-      have x's.xZero : x's.z = 0 := by
-        rw [x'sZero]
-      have y's.xZero : y's.z = 0 := by
-        rw [y'sZero]-/
