@@ -69,68 +69,69 @@ theorem x_eq_y_eq_events : ∀ (x y : Point4), ∀ (ob : B), x = y → events ob
   simp
   rw [xeqy]
 
-theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 → spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
-  intro m x y iom ytgtxt onLightcone
-  let yOpp : Point4 :=
-    fun n : Fin 4 =>
-    match n with
-    | 0 => (x 0) - (y 0 - x 0)
-    | 1 => (x 1) - (y 1 - x 1)
-    | 2 => (x 2) - (y 2 - x 2)
-    | 3 => y 3
+theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 →
+  spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
+    intro m x y iom ytgtxt onLightcone
+    let yOpp : Point4 :=
+      fun n : Fin 4 =>
+      match n with
+      | 0 => (x 0) - (y 0 - x 0)
+      | 1 => (x 1) - (y 1 - x 1)
+      | 2 => (x 2) - (y 2 - x 2)
+      | 3 => y 3
 
-  have h0 := (axph m x yOpp iom).mpr
-  have sDistyyOppEq : spaceDistanceSq x y = spaceDistanceSq x yOpp := by
-    unfold spaceDistanceSq
-    unfold spatial
-    unfold spaceNormSq
-    simp [yOpp]
-    ring
-  rw [sDistyyOppEq] at onLightcone
-  have : y 3 = yOpp 3 := rfl
-  rw [this] at onLightcone
-  rw [abs_sub_comm] at onLightcone
-  have h0 := h0 onLightcone
-  obtain ⟨p, hp, hwmpx, hmpyopp⟩ := h0
-  use p
-  constructor
-  exact hp
-  constructor
-  exact hwmpx
-
-  intro wmpy
-  have sd_y_yOpp := (axph m y yOpp iom).1 ⟨p, hp, wmpy, hmpyopp⟩
-  have sd_y_yOpp_zero : spaceDistanceSq y yOpp = 0 := by
-    simpa [yOpp] using sd_y_yOpp
-  have calcDist : spaceDistanceSq y yOpp = 4 * spaceDistanceSq x y := by
-    unfold spaceDistanceSq
-    unfold spatial
-    unfold spaceNormSq
-    simp [yOpp]
-    ring
-  have sxy_zero : spaceDistanceSq x y = 0 := by
-    have h : 4 * spaceDistanceSq x y = 0 := by
-      simpa [calcDist] using sd_y_yOpp_zero
-    have h4 : (4:ℝ) ≠ 0 := by norm_num
-    exact (mul_eq_zero.mp h).resolve_left h4
-  --have pos_time : 0 < y 3 - x 3 := sub_pos.mpr ytgtxt
-  --have abs_eq : abs (y 3 - x 3) = y 3 - x 3 := abs_of_pos pos_time
-  have hsq : (y 3 - x 3) ^ 2 = 0 := by
-    have onL := onLightcone
-    rw [← this] at onL
-    rw [← sq_abs]
-    rw [abs_sub_comm]
-    have yyOppSpaceDist : spaceDistanceSq x y = spaceDistanceSq x yOpp := by
+    have h0 := (axph m x yOpp iom).mpr
+    have sDistyyOppEq : spaceDistanceSq x y = spaceDistanceSq x yOpp := by
       unfold spaceDistanceSq
       unfold spatial
       unfold spaceNormSq
-      simp
+      simp [yOpp]
       ring
-    rw [← yyOppSpaceDist, sxy_zero] at onL
-    exact onL.symm
-  have htime_eq : y 3 - x 3 = 0 := (sq_eq_zero_iff).1 hsq
-  have hyeqxtime : y 3 = x 3 := sub_eq_zero.mp htime_eq
-  exact (ne_of_gt ytgtxt) hyeqxtime
+    rw [sDistyyOppEq] at onLightcone
+    have : y 3 = yOpp 3 := rfl
+    rw [this] at onLightcone
+    rw [abs_sub_comm] at onLightcone
+    have h0 := h0 onLightcone
+    obtain ⟨p, hp, hwmpx, hmpyopp⟩ := h0
+    use p
+    constructor
+    exact hp
+    constructor
+    exact hwmpx
+
+    intro wmpy
+    have sd_y_yOpp := (axph m y yOpp iom).1 ⟨p, hp, wmpy, hmpyopp⟩
+    have sd_y_yOpp_zero : spaceDistanceSq y yOpp = 0 := by
+      simpa [yOpp] using sd_y_yOpp
+    have calcDist : spaceDistanceSq y yOpp = 4 * spaceDistanceSq x y := by
+      unfold spaceDistanceSq
+      unfold spatial
+      unfold spaceNormSq
+      simp [yOpp]
+      ring
+    have sxy_zero : spaceDistanceSq x y = 0 := by
+      have h : 4 * spaceDistanceSq x y = 0 := by
+        simpa [calcDist] using sd_y_yOpp_zero
+      have h4 : (4:ℝ) ≠ 0 := by norm_num
+      exact (mul_eq_zero.mp h).resolve_left h4
+    --have pos_time : 0 < y 3 - x 3 := sub_pos.mpr ytgtxt
+    --have abs_eq : abs (y 3 - x 3) = y 3 - x 3 := abs_of_pos pos_time
+    have hsq : (y 3 - x 3) ^ 2 = 0 := by
+      have onL := onLightcone
+      rw [← this] at onL
+      rw [← sq_abs]
+      rw [abs_sub_comm]
+      have yyOppSpaceDist : spaceDistanceSq x y = spaceDistanceSq x yOpp := by
+        unfold spaceDistanceSq
+        unfold spatial
+        unfold spaceNormSq
+        simp
+        ring
+      rw [← yyOppSpaceDist, sxy_zero] at onL
+      exact onL.symm
+    have htime_eq : y 3 - x 3 = 0 := (sq_eq_zero_iff).1 hsq
+    have hyeqxtime : y 3 = x 3 := sub_eq_zero.mp htime_eq
+    exact (ne_of_gt ytgtxt) hyeqxtime
 
 
 
@@ -242,109 +243,110 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : Point4) (b : B), IOb b → x ≠ y → ev
         exact hnwbpx h
 
 
-theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k → ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by
-  intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
-  have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
-  have pEVmx : p ∈ events m x := by
-    rw [events]
-    exact mpx
-  have pEVmy : p ∈ events m y := by
-    rw [events]
-    exact mpy
-  have ⟨x', EVmxeqkx'⟩ := axev m k iom iok x
-  have ⟨y', EVmyeqky'⟩ := axev m k iom iok y
+theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
+  ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by
+    intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
+    have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
+    have pEVmx : p ∈ events m x := by
+      rw [events]
+      exact mpx
+    have pEVmy : p ∈ events m y := by
+      rw [events]
+      exact mpy
+    have ⟨x', EVmxeqkx'⟩ := axev m k iom iok x
+    have ⟨y', EVmyeqky'⟩ := axev m k iom iok y
 
-  have EVneq1 : events m x ≠ events m y := x_ne_y_evx_ne_evy x y m iom xney
+    have EVneq1 : events m x ≠ events m y := x_ne_y_evx_ne_evy x y m iom xney
 
-  have EVneq2 : events k x' ≠ events k y' := by
-    rw [← EVmxeqkx']
-    rw [← EVmyeqky']
-    exact EVneq1
-  have x'neqy' : x' ≠ y' := by
-    have := x_eq_y_eq_events x' y' k
-    by_contra x'eqy'
-    have EVkx'eqky' := this x'eqy'
+    have EVneq2 : events k x' ≠ events k y' := by
+      rw [← EVmxeqkx']
+      rw [← EVmyeqky']
+      exact EVneq1
+    have x'neqy' : x' ≠ y' := by
+      have := x_eq_y_eq_events x' y' k
+      by_contra x'eqy'
+      have EVkx'eqky' := this x'eqy'
+      contradiction
+
+    let x's : Point3 := spatial x'
+    let y's : Point3 := spatial y'
+
+    have x'sZero : x's = ![0, 0, 0] := by
+      have  : W k k x' := by
+        rw [← eventsToWorldview]
+        rw [← EVmxeqkx']
+        rw [eventsToWorldview]
+        exact mkx
+      have := axsf k iok x' this
+      simp [x's]
+      unfold spatial
+      simp
+      simp [this]
+      aesop
+
+    have y'sZero : y's = ![0, 0, 0] := by
+      have  : W k k y' := by
+        rw [← eventsToWorldview]
+        rw [← EVmyeqky']
+        rw [eventsToWorldview]
+        exact mky
+      have := axsf k iok y' this
+      simp [y's]
+      unfold spatial
+      simp
+      simp [this]
+      aesop
+
+    have spacedistSqx'y'0 : spaceDistanceSq x' y' = 0 := by
+      unfold spaceDistanceSq
+      change spaceNormSq (x's - y's) = 0
+      rw [x'sZero, y'sZero]
+      simp
+      unfold spaceNormSq
+      simp
+
+    have x'teqy't : x' 3 = y' 3 := by
+      have pEVkx' : p ∈ events k x' := by
+        rw [← EVmxeqkx']
+        exact pEVmx
+      have pEVky' : p ∈ events k y' := by
+        rw [← EVmyeqky']
+        exact pEVmy
+      have pWkx' : W k p x' := (eventsToWorldview p k x').mp pEVkx'
+      have pWky' : W k p y' := (eventsToWorldview p k y').mp pEVky'
+      have photon_k : ∃ p₀, Ph p₀ ∧ W k p₀ x' ∧ W k p₀ y' := ⟨p, pph, pWkx', pWky'⟩
+      have lightspeed_k : spaceDistanceSq x' y' = abs (x' 3 - y' 3) ^ 2 :=
+        (axph k x' y' iok).mp photon_k
+      have h0 : 0 = abs (x' 3 - y' 3) ^ 2 :=
+        Eq.trans spacedistSqx'y'0.symm lightspeed_k
+      have habs0 : abs (x' 3 - y' 3) ^ 2 = 0 := h0.symm
+      have habs : abs (x' 3 - y' 3) = 0 := by
+        have : abs (x' 3 - y' 3) * abs (x' 3 - y' 3) = 0 := by
+          simpa [pow_two] using habs0
+        exact mul_self_eq_zero.mp this
+      have diff0 : x' 3 - y' 3 = 0 := abs_eq_zero.mp habs
+      exact sub_eq_zero.mp diff0
+
+    have x'eqy' : x' = y' := by
+      have hx0 : x' 0 = 0 := by
+        have h := congrArg (fun f => f 0) x'sZero
+        simpa [spatial] using h
+      have hx1 : x' 1 = 0 := by
+        have h := congrArg (fun f => f 1) x'sZero
+        simpa [spatial] using h
+      have hx2 : x' 2 = 0 := by
+        have h := congrArg (fun f => f 2) x'sZero
+        simpa [spatial] using h
+      have hy0 : y' 0 = 0 := by
+        have h := congrArg (fun f => f 0) y'sZero
+        simpa [spatial] using h
+      have hy1 : y' 1 = 0 := by
+        have h := congrArg (fun f => f 1) y'sZero
+        simpa [spatial] using h
+      have hy2 : y' 2 = 0 := by
+        have h := congrArg (fun f => f 2) y'sZero
+        simpa [spatial] using h
+      ext i
+      fin_cases i <;> simp [hx0, hx1, hx2, hy0, hy1, hy2, x'teqy't]
+
     contradiction
-
-  let x's : Point3 := spatial x'
-  let y's : Point3 := spatial y'
-
-  have x'sZero : x's = ![0, 0, 0] := by
-    have  : W k k x' := by
-      rw [← eventsToWorldview]
-      rw [← EVmxeqkx']
-      rw [eventsToWorldview]
-      exact mkx
-    have := axsf k iok x' this
-    simp [x's]
-    unfold spatial
-    simp
-    simp [this]
-    aesop
-
-  have y'sZero : y's = ![0, 0, 0] := by
-    have  : W k k y' := by
-      rw [← eventsToWorldview]
-      rw [← EVmyeqky']
-      rw [eventsToWorldview]
-      exact mky
-    have := axsf k iok y' this
-    simp [y's]
-    unfold spatial
-    simp
-    simp [this]
-    aesop
-
-  have spacedistSqx'y'0 : spaceDistanceSq x' y' = 0 := by
-    unfold spaceDistanceSq
-    change spaceNormSq (x's - y's) = 0
-    rw [x'sZero, y'sZero]
-    simp
-    unfold spaceNormSq
-    simp
-
-  have x'teqy't : x' 3 = y' 3 := by
-    have pEVkx' : p ∈ events k x' := by
-      rw [← EVmxeqkx']
-      exact pEVmx
-    have pEVky' : p ∈ events k y' := by
-      rw [← EVmyeqky']
-      exact pEVmy
-    have pWkx' : W k p x' := (eventsToWorldview p k x').mp pEVkx'
-    have pWky' : W k p y' := (eventsToWorldview p k y').mp pEVky'
-    have photon_k : ∃ p₀, Ph p₀ ∧ W k p₀ x' ∧ W k p₀ y' := ⟨p, pph, pWkx', pWky'⟩
-    have lightspeed_k : spaceDistanceSq x' y' = abs (x' 3 - y' 3) ^ 2 :=
-      (axph k x' y' iok).mp photon_k
-    have h0 : 0 = abs (x' 3 - y' 3) ^ 2 :=
-      Eq.trans spacedistSqx'y'0.symm lightspeed_k
-    have habs0 : abs (x' 3 - y' 3) ^ 2 = 0 := h0.symm
-    have habs : abs (x' 3 - y' 3) = 0 := by
-      have : abs (x' 3 - y' 3) * abs (x' 3 - y' 3) = 0 := by
-        simpa [pow_two] using habs0
-      exact mul_self_eq_zero.mp this
-    have diff0 : x' 3 - y' 3 = 0 := abs_eq_zero.mp habs
-    exact sub_eq_zero.mp diff0
-
-  have x'eqy' : x' = y' := by
-    have hx0 : x' 0 = 0 := by
-      have h := congrArg (fun f => f 0) x'sZero
-      simpa [spatial] using h
-    have hx1 : x' 1 = 0 := by
-      have h := congrArg (fun f => f 1) x'sZero
-      simpa [spatial] using h
-    have hx2 : x' 2 = 0 := by
-      have h := congrArg (fun f => f 2) x'sZero
-      simpa [spatial] using h
-    have hy0 : y' 0 = 0 := by
-      have h := congrArg (fun f => f 0) y'sZero
-      simpa [spatial] using h
-    have hy1 : y' 1 = 0 := by
-      have h := congrArg (fun f => f 1) y'sZero
-      simpa [spatial] using h
-    have hy2 : y' 2 = 0 := by
-      have h := congrArg (fun f => f 2) y'sZero
-      simpa [spatial] using h
-    ext i
-    fin_cases i <;> simp [hx0, hx1, hx2, hy0, hy1, hy2, x'teqy't]
-
-  contradiction
