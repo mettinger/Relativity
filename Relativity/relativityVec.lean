@@ -73,15 +73,20 @@ theorem x_eq_y_eq_events : ∀ (x y : Point4), ∀ (ob : B), x = y → events ob
 theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 → spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
   intro m x y iom ytgtxt onLightcone
   let yOpp : Point4 :=
-    fun x : Fin 4 =>
-    match x with
-    | 0 => -(y 0)
-    | 1 => -(y 1)
-    | 2 => -(y 2)
+    fun n : Fin 4 =>
+    match n with
+    | 0 => (x 0) - (y 0 - x 0)
+    | 1 => (x 1) - (y 1 - x 1)
+    | 2 => (x 2) - (y 2 - x 2)
     | 3 => y 3
 
   have h0 := (axph m x yOpp iom).mpr
-  have sDistyyOppEq : spaceDistanceSq x y = spaceDistanceSq x yOpp := sorry
+  have sDistyyOppEq : spaceDistanceSq x y = spaceDistanceSq x yOpp := by
+    unfold spaceDistanceSq
+    unfold spatial
+    unfold spaceNormSq
+    simp [yOpp]
+    ring
   rw [sDistyyOppEq] at onLightcone
   have : y 3 = yOpp 3 := rfl
   rw [this] at onLightcone
@@ -93,7 +98,41 @@ theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 → space
   exact hp
   constructor
   exact hwmpx
-  sorry
+
+  intro wmpy
+  have sd_y_yOpp := (axph m y yOpp iom).1 ⟨p, hp, wmpy, hmpyopp⟩
+  have sd_y_yOpp_zero : spaceDistanceSq y yOpp = 0 := by
+    simpa [yOpp] using sd_y_yOpp
+  have calcDist : spaceDistanceSq y yOpp = 4 * spaceDistanceSq x y := by
+    unfold spaceDistanceSq
+    unfold spatial
+    unfold spaceNormSq
+    simp [yOpp]
+    ring
+  have sxy_zero : spaceDistanceSq x y = 0 := by
+    have h : 4 * spaceDistanceSq x y = 0 := by
+      simpa [calcDist] using sd_y_yOpp_zero
+    have h4 : (4:ℝ) ≠ 0 := by norm_num
+    exact (mul_eq_zero.mp h).resolve_left h4
+  --have pos_time : 0 < y 3 - x 3 := sub_pos.mpr ytgtxt
+  --have abs_eq : abs (y 3 - x 3) = y 3 - x 3 := abs_of_pos pos_time
+  have hsq : (y 3 - x 3) ^ 2 = 0 := by
+    have onL := onLightcone
+    rw [← this] at onL
+    rw [← sq_abs]
+    rw [abs_sub_comm]
+    have yyOppSpaceDist : spaceDistanceSq x y = spaceDistanceSq x yOpp := by
+      unfold spaceDistanceSq
+      unfold spatial
+      unfold spaceNormSq
+      simp
+      ring
+    rw [← yyOppSpaceDist, sxy_zero] at onL
+    exact onL.symm
+  have htime_eq : y 3 - x 3 = 0 := (sq_eq_zero_iff).1 hsq
+  have hyeqxtime : y 3 = x 3 := sub_eq_zero.mp htime_eq
+  exact (ne_of_gt ytgtxt) hyeqxtime
+
 
 
 
