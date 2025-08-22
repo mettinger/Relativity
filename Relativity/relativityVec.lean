@@ -70,7 +70,34 @@ theorem x_eq_y_eq_events : ∀ (x y : Point4), ∀ (ob : B), x = y → events ob
   simp
   rw [xeqy]
 
-theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 → spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := sorry
+theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 → spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
+  intro m x y iom ytgtxt onLightcone
+  let yOpp : Point4 :=
+    fun x : Fin 4 =>
+    match x with
+    | 0 => -(y 0)
+    | 1 => -(y 1)
+    | 2 => -(y 2)
+    | 3 => y 3
+
+  have h0 := (axph m x yOpp iom).mpr
+  have sDistyyOppEq : spaceDistanceSq x y = spaceDistanceSq x yOpp := sorry
+  rw [sDistyyOppEq] at onLightcone
+  have : y 3 = yOpp 3 := rfl
+  rw [this] at onLightcone
+  rw [abs_sub_comm] at onLightcone
+  have h0 := h0 onLightcone
+  obtain ⟨p, hp, hwmpx, hmpyopp⟩ := h0
+  use p
+  constructor
+  exact hp
+  constructor
+  exact hwmpx
+  sorry
+
+
+
+
 
 theorem sp_tm_eq_eq : ∀ (x y: Point4), spaceDistanceSq x y = 0 → x 3 = y 3 → x = y := by
   intro x y hsp htime
