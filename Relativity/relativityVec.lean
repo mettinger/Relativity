@@ -36,7 +36,6 @@ def AxPh : Prop := ∀ (m : B), ∀ (x y : Point4), IOb m →
 axiom axph : AxPh
 -- END AXIOM
 
-
 -- AXIOM 2: "All inertial observers coordinatize the same set of events."
 def AxEv : Prop := ∀ (m k : B), IOb m → IOb k → ∀ (x : Point4), ∃ (y : Point4), events m x = events k y
 
@@ -180,7 +179,7 @@ theorem sp_tm_eq_eq : ∀ (x y: Point4), spaceDistanceSq x y = 0 → x 3 = y 3 �
   have hx2 : x 2 = y 2 := by
     have := (sq_eq_zero_iff).1 hx2sq
     simpa [sub_eq_zero] using this
-  ext i <;> fin_cases i <;> simp [hx0, hx1, hx2, htime]
+  ext i ; fin_cases i <;> simp [hx0, hx1, hx2, htime]
 
 theorem spaceDistComm : ∀ (x y: Point4), spaceDistanceSq x y = spaceDistanceSq y x := by
   intro x y
