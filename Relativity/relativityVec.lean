@@ -134,10 +134,6 @@ theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 →
     exact (ne_of_gt ytgtxt) hyeqxtime
 
 
-
-
-
-
 theorem sp_tm_eq_eq : ∀ (x y: Point4), spaceDistanceSq x y = 0 → x 3 = y 3 → x = y := by
   intro x y hsp htime
   have hsum := hsp
@@ -242,6 +238,31 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : Point4) (b : B), IOb b → x ≠ y → ev
           exact (eventsToWorldview p b x).mp pEVbx
         exact hnwbpx h
 
+
+theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
+  ¬ spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 := by
+    intro m k x y ⟨hwmkx, hwmky, xney, iob, iok⟩ spaceDistGreater
+    sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#exit
 
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by
