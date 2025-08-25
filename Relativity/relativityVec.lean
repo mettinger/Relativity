@@ -235,30 +235,6 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : Point4) (b : B), IOb b → x ≠ y → ev
         exact hnwbpx h
 
 
-theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
-  ¬ spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 := by
-    intro m k x y ⟨hwmkx, hwmky, xney, iob, iok⟩ spaceDistGreater
-    sorry
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#exit
-
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by
     intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
