@@ -30,29 +30,25 @@ def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
 
 -- AXIOM 1: "For any inertial observer, the speed of light is 1. Furthermore, it is possible to send out a light signal in any direction."
 
-def AxPh : Prop := ∀ (m : B), ∀ (x y : Point4), IOb m →
+axiom axph : ∀ (m : B), ∀ (x y : Point4), IOb m →
   ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = abs (x 3 - y 3) ^2))
 
-axiom axph : AxPh
 -- END AXIOM
 
 -- AXIOM 2: "All inertial observers coordinatize the same set of events."
-def AxEv : Prop := ∀ (m k : B), IOb m → IOb k → ∀ (x : Point4), ∃ (y : Point4), events m x = events k y
+axiom axev : ∀ (m k : B), IOb m → IOb k → ∀ (x : Point4), ∃ (y : Point4), events m x = events k y
 
-axiom axev : AxEv
 -- END AXIOM
 
 -- AXIOM 3: "Any inertial observer sees himself as standing still at the origin."
-def AxSf : Prop := ∀ (m : B), IOb m → ∀ (x : Point4), W m m x → x 0 = 0 ∧ x 1 = 0 ∧ x 2 = 0
+axiom axsf : ∀ (m : B), IOb m → ∀ (x : Point4), W m m x → x 0 = 0 ∧ x 1 = 0 ∧ x 2 = 0
 
-axiom axsf : AxSf
 -- END AXIOM
 
 -- AXIOM 4 : " Any two inertial observers agree as to the spatial distance between two events if these two events are simultaneous for both of them."
 
-def AxSm : Prop := ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x 3 = y 3) ∧ (x' 3 = y' 3) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistanceSq x y = spaceDistanceSq x' y'
+axiom axsm : ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x 3 = y 3) ∧ (x' 3 = y' 3) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistanceSq x y = spaceDistanceSq x' y'
 
-axiom axsm : AxSm
 -- END AXIOM
 
 --------------------------------------------
@@ -243,7 +239,6 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m 
   ¬ spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 := by
     intro m k x y ⟨hwmkx, hwmky, xney, iob, iok⟩ spaceDistGreater
     sorry
-
 
 
 
