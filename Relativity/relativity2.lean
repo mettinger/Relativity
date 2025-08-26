@@ -14,12 +14,12 @@ theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 
             ∧ ⟪ spatial z - spatial x, spatial y - spatial x ⟫ = 0 := sorry
 
 theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → ∃ (z : R4),
-  ∀ (w : R4), ¬ lightLike w x ∧ lightLike x y ∧ lightLike w z := sorry
+  lightLike x z ∧
+  ∀ (w : R4), ¬ (lightLike w x ∧ lightLike x y ∧ lightLike w z) := sorry
 
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 := by
     intro m k x y ⟨hwmkx, hwmky, xney, iob, iok⟩ spaceDistGreater
     have zwExist := zExist x y spaceDistGreater
-    obtain ⟨z, hw⟩ := zwExist
-    sorry
+    obtain ⟨z, ⟨hz, hw⟩⟩ := zwExist

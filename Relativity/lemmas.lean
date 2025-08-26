@@ -5,12 +5,14 @@ theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ 
   rw [events]
   simp
 
+/-
 theorem x_eq_y_eq_events : ∀ (x y : R4), ∀ (ob : B), x = y → events ob x = events ob y := by
   intro x y ob xeqy
   ext ob
   unfold events
   simp
   rw [xeqy]
+-/
 
 theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
   spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by

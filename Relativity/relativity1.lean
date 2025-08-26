@@ -20,9 +20,8 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x
       rw [← EVmyeqky']
       exact EVneq1
     have x'neqy' : x' ≠ y' := by
-      have := x_eq_y_eq_events x' y' k
       by_contra x'eqy'
-      have EVkx'eqky' := this x'eqy'
+      rw [x'eqy'] at EVneq2
       contradiction
 
     let x's : R3 := spatial x'
