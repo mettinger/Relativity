@@ -20,7 +20,12 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → �
 --axiom axev : ∀ (m k : B), IOb m → IOb k → ∀ (x : R4), ∃ (y : R4), events m x = events k y
 
 theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →
-  ∀ (m k : B), IOb m → IOb k → events m x = events k x' → events m y = events k y' → x' ≠ y' := sorry
+  ∀ (m k : B), IOb m → IOb k → events m x = events k x' → events m y = events k y' → x' ≠ y' := by
+    intro x y x' y' hxney m k iom _ hxx'EventsEq hyy'EventsEq hx'eqy'
+    rw [← hx'eqy'] at hyy'EventsEq
+    rw [← hyy'EventsEq] at hxx'EventsEq
+    have hxx'EventsNotEq := x_ne_y_evx_ne_evy x y m iom hxney
+    exact hxx'EventsNotEq hxx'EventsEq
 
 theorem lightLikeImplightLike: ∀ (x y x' y' : R4), ∀ (m k : B), IOb m → IOb k →
   lightLike x y → events m x = events k x' -> events m y = events k y' → lightLike x' y' := sorry
