@@ -38,7 +38,7 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
       lightLike w' x' ∧
       lightLike w' y' ∧
       lightLike w' z' := sorry
-    obtain ⟨w, hwEvents⟩ := axev m k iob iok w'
+    obtain ⟨w, hwEvents⟩ := axev k m iok iob w'
     have hw : lightLike w x ∧ lightLike w y ∧ lightLike w z := sorry
     have hwNot := hwNotExist w
     contradiction
