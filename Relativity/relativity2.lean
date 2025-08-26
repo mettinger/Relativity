@@ -28,7 +28,9 @@ theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →
     exact hxx'EventsNotEq hxx'EventsEq
 
 theorem lightLikeImplightLike: ∀ (x y x' y' : R4), ∀ (m k : B), IOb m → IOb k →
-  lightLike x y → events m x = events k x' -> events m y = events k y' → lightLike x' y' := sorry
+  lightLike x y → events m x = events k x' -> events m y = events k y' → lightLike x' y' := by
+    intro x y x' y' m k iom iok hllxy hxx'EventsEq hyy'EventsEq
+
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 := by
