@@ -1,15 +1,11 @@
 import Mathlib
-open scoped RealInnerProductSpace
-noncomputable section
+--set_option diagnostics true
 
-
-abbrev R4 := EuclideanSpace ℝ (Fin 4)
-abbrev R3 := EuclideanSpace ℝ (Fin 3)
-
-
+abbrev Point4 : Type := Fin 4 → ℝ
+abbrev Point3 : Type := Fin 3 → ℝ
 
 -- project 4d point to its spatial components
-def spatial (p : R4) : R3 :=
+def spatial (p : Point4) : Point3 :=
   fun x : Fin 3 =>
     match x with
     | 0 => p 0
@@ -17,62 +13,62 @@ def spatial (p : R4) : R3 :=
     | 2 => p 2
 
 -- compute the norm of a 3d point
-def spaceNormSq (p : R3) : ℝ := p 0 ^ 2 + p 1 ^ 2 + p 2 ^ 2
+def spaceNormSq (p : Point3) : ℝ := p 0 ^ 2 + p 1 ^ 2 + p 2 ^ 2
 
 -- compute the spatial distance between two 4d points
-def spaceDistanceSq (p q : R4) : ℝ := spaceNormSq ((spatial p) - (spatial q))
+def spaceDistanceSq (p q : Point4) : ℝ := spaceNormSq ((spatial p) - (spatial q))
 
 axiom B : Type -- Bodies
 axiom IB : B → Prop -- Inertial bodies predicate
 axiom Ph : B → Prop -- Photon predicate
-axiom W : B → B → R4 → Prop -- Worldview predicate
+axiom W : B → B → Point4 → Prop -- Worldview predicate
 
-def Ob (m : B) : Prop := ∃ (b : B) (pt : R4 ) , W m b pt -- Observer predicate
+def Ob (m : B) : Prop := ∃ (b : B) (pt : Point4 ) , W m b pt -- Observer predicate
 def IOb (m : B) : Prop := IB m ∧ Ob m -- Inertial observer predicate
-def events (m : B) (x : R4) : Set B := { b | W m b x } -- events observed by m at x
-def wl (m b : B) : Set R4 := {x | W m b x} -- worldline of b as viewed by m
+def events (m : B) (x : Point4) : Set B := { b | W m b x } -- events observed by m at x
+def wl (m b : B) : Set Point4 := {x | W m b x} -- worldline of b as viewed by m
 
 -- AXIOM 1: "For any inertial observer, the speed of light is 1. Furthermore, it is possible to send out a light signal in any direction."
 
-axiom axph : ∀ (m : B), ∀ (x y : R4), IOb m →
+axiom axph : ∀ (m : B), ∀ (x y : Point4), IOb m →
   ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = abs (x 3 - y 3) ^2))
 
 -- END AXIOM
 
 -- AXIOM 2: "All inertial observers coordinatize the same set of events."
-axiom axev : ∀ (m k : B), IOb m → IOb k → ∀ (x : R4), ∃ (y : R4), events m x = events k y
+axiom axev : ∀ (m k : B), IOb m → IOb k → ∀ (x : Point4), ∃ (y : Point4), events m x = events k y
 
 -- END AXIOM
 
 -- AXIOM 3: "Any inertial observer sees himself as standing still at the origin."
-axiom axsf : ∀ (m : B), IOb m → ∀ (x : R4), W m m x → x 0 = 0 ∧ x 1 = 0 ∧ x 2 = 0
+axiom axsf : ∀ (m : B), IOb m → ∀ (x : Point4), W m m x → x 0 = 0 ∧ x 1 = 0 ∧ x 2 = 0
 
 -- END AXIOM
 
 -- AXIOM 4 : " Any two inertial observers agree as to the spatial distance between two events if these two events are simultaneous for both of them."
 
-axiom axsm : ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : R4), (x 3 = y 3) ∧ (x' 3 = y' 3) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistanceSq x y = spaceDistanceSq x' y'
+axiom axsm : ∀ (m k : B), IOb m ∧ IOb k → ∀ (x y x' y' : Point4), (x 3 = y 3) ∧ (x' 3 = y' 3) ∧ (events m x = events k x') ∧ (events m y = events k y) → spaceDistanceSq x y = spaceDistanceSq x' y'
 
 -- END AXIOM
 
 --------------------------------------------
 
-theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ W ob b x := by
+theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : Point4), b ∈ events ob x ↔ W ob b x := by
   intro b ob x
   rw [events]
   simp
 
-theorem x_eq_y_eq_events : ∀ (x y : R4), ∀ (ob : B), x = y → events ob x = events ob y := by
+theorem x_eq_y_eq_events : ∀ (x y : Point4), ∀ (ob : B), x = y → events ob x = events ob y := by
   intro x y ob xeqy
   ext ob
   unfold events
   simp
   rw [xeqy]
 
-theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
+theorem oppDirection : ∀ (m : B) (x y : Point4), IOb m → y 3 > x 3 →
   spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
     intro m x y iom ytgtxt onLightcone
-    let yOpp : R4 :=
+    let yOpp : Point4 :=
       fun n : Fin 4 =>
       match n with
       | 0 => (x 0) - (y 0 - x 0)
@@ -134,7 +130,7 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     exact (ne_of_gt ytgtxt) hyeqxtime
 
 
-theorem sp_tm_eq_eq : ∀ (x y: R4), spaceDistanceSq x y = 0 → x 3 = y 3 → x = y := by
+theorem sp_tm_eq_eq : ∀ (x y: Point4), spaceDistanceSq x y = 0 → x 3 = y 3 → x = y := by
   intro x y hsp htime
   have hsum := hsp
   unfold spaceDistanceSq at hsum
@@ -178,7 +174,7 @@ theorem sp_tm_eq_eq : ∀ (x y: R4), spaceDistanceSq x y = 0 → x 3 = y 3 → x
     simpa [sub_eq_zero] using this
   ext i ; fin_cases i <;> simp [hx0, hx1, hx2, htime]
 
-theorem spaceDistComm : ∀ (x y: R4), spaceDistanceSq x y = spaceDistanceSq y x := by
+theorem spaceDistComm : ∀ (x y: Point4), spaceDistanceSq x y = spaceDistanceSq y x := by
   intro x y
   unfold spaceDistanceSq
   unfold spatial
@@ -186,7 +182,7 @@ theorem spaceDistComm : ∀ (x y: R4), spaceDistanceSq x y = spaceDistanceSq y x
   simp
   ring
 
-theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by
+theorem x_ne_y_evx_ne_evy : ∀ (x y : Point4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by
   intro x y b iobb xney events_eq
   by_cases spatialDistance : spaceDistanceSq x y = abs (x 3 - y 3) ^ 2
   case neg =>
@@ -239,7 +235,7 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events
         exact hnwbpx h
 
 
-theorem notLightSpeed : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
+theorem notLightSpeed : ∀ (m k : B), ∀ (x y : Point4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by
     intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
     have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
@@ -264,8 +260,8 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x
       have EVkx'eqky' := this x'eqy'
       contradiction
 
-    let x's : R3 := spatial x'
-    let y's : R3 := spatial y'
+    let x's : Point3 := spatial x'
+    let y's : Point3 := spatial y'
 
     have x'sZero : x's = ![0, 0, 0] := by
       have  : W k k x' := by
