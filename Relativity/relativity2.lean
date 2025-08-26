@@ -1,4 +1,5 @@
-import Relativity.definitions
+import Relativity.lemmas
+
 open scoped RealInnerProductSpace
 
 theorem zExistsxtneyt : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → x 3 ≠ y 3 →
