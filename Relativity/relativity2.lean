@@ -1,6 +1,21 @@
 import Relativity.lemmas
 
 open scoped RealInnerProductSpace
+open EuclideanSpace
+
+theorem norm_sq_eq {𝕜 : Type*} [RCLike 𝕜] {n : Type*} [Fintype n]
+    (x : EuclideanSpace 𝕜 n) : ‖x‖ ^ 2 = ∑ i, ‖x i‖ ^ 2 :=
+  PiLp.norm_sq_eq_of_L2 _ x
+
+theorem norm_sq_is_sum_of_squares : ∀ (v : R3), (v 0)^2 + (v 1)^2 + (v 2)^2 = (norm v) ^ 2 := by
+  intro v
+  rw [norm_sq_eq]
+  norm_num
+  have hcoords :
+      (v 0) ^ 2 + (v 1) ^ 2 + (v 2) ^ 2 = ∑ x : Fin 3, (v x) ^ 2 := by
+    simpa using
+      (Fin.sum_univ_three (fun x : Fin 3 => (v x) ^ 2)).symm
+  exact hcoords
 
 theorem spaceNormSqConstant : ∀ (c : ℝ) (v : R3), spaceNormSq (c • v) = (c ^ 2) * (norm v) ^ 2 := by
   intro c v
@@ -10,13 +25,7 @@ theorem spaceNormSqConstant : ∀ (c : ℝ) (v : R3), spaceNormSq (c • v) = (c
   rw [← mul_add, ← mul_add]
   field_simp
   left
-
-
-
-
-
-
-
+  exact norm_sq_is_sum_of_squares v
 
 theorem spatialDiff : ∀ (x y : R4), spatial x - spatial y = ![x 0 - y 0, x 1 - y 1, x 2 - y 2] := by
   intro x y
@@ -44,9 +53,9 @@ theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > (x 3 - y 3) ^ 2 �
   let yxSpatialDiff : R3 := ![y 0 - x 0, y 1 - x 1, y 2 - x 2]
   let ws : R3 := (norm yxSpatialDiff) ^ (-1 : ℝ )  • yxSpatialDiff
   let wsPerp : R3 := (√((y 2 - x 2) ^ 2 + (x 1 - y 1) ^ 2)) ^ (-1 : ℝ)  • ![y 2 - x 2, x 1 - y 1, 0]
-  let zss : R3 := ((norm yxSpatialDiff) • wsPerp)
+  let zs1 : R3 := ((norm yxSpatialDiff) • wsPerp)
   let zt : ℝ := (norm yxSpatialDiff) + x 3
-  let z : R4 := ![zss 0 + x 0, zss 1 + x 1, zss 2 + x 2, zt]
+  let z : R4 := ![zs1 0 + x 0, zs1 1 + x 1, zs1 2 + x 2, zt]
   use z
   constructor
   case h.left := by
@@ -54,9 +63,14 @@ theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > (x 3 - y 3) ^ 2 �
       simp [z,zt]
     rw [h0]
     have hzsub : spatial z - spatial x = (norm yxSpatialDiff) • wsPerp := by
-      sorry
+      unfold spatial
+      ext i
+      aesop
     have hwsPerpNorm : norm wsPerp = 1 := by
       sorry
+
+
+
     unfold spaceDistanceSq
     rw [hzsub]
     rw [spaceNormSqConstant (norm yxSpatialDiff) wsPerp]
