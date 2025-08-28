@@ -2,16 +2,83 @@ import Relativity.lemmas
 
 open scoped RealInnerProductSpace
 
-theorem zExistsxtneyt : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → x 3 ≠ y 3 →
-            ∃ (z : R4), spaceDistanceSq z x = abs ( z 3 - x 3) ^ 2
-            ∧ (z 3 - x 3) ≠ 0
-            ∧ z3 = y 3
-            ∧ ⟪ spatial z - spatial x, spatial z - spatial y ⟫ = 0 := sorry
+theorem spaceNormSqConstant : ∀ (c : ℝ) (v : R3), spaceNormSq (c • v) = (c ^ 2) * (norm v) ^ 2 := by
+  intro c v
+  unfold spaceNormSq
+  simp
+  rw [mul_pow, mul_pow, mul_pow]
+  rw [← mul_add, ← mul_add]
+  field_simp
+  left
 
-theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → x 3 = y 3 →
-            ∃ (z : R4), spaceDistanceSq z x = abs ( z 3 - x 3) ^ 2
-            ∧ (z 3 - x 3) ≠ 0
-            ∧ ⟪ spatial z - spatial x, spatial y - spatial x ⟫ = 0 := sorry
+
+
+
+
+
+
+
+theorem spatialDiff : ∀ (x y : R4), spatial x - spatial y = ![x 0 - y 0, x 1 - y 1, x 2 - y 2] := by
+  intro x y
+  unfold spatial
+  aesop
+
+theorem zExistsxtneyt : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → x 3 ≠ y 3 →
+  ∃ (z : R4), spaceDistanceSq z x = abs ( z 3 - x 3) ^ 2
+  ∧ (z 3 - x 3) ≠ 0
+  ∧ z 3 = y 3
+  ∧ ⟪ spatial z - spatial x, spatial z - spatial y ⟫ = 0 := by
+    intro x y hxyspaceLike xtneyt
+    let yxSpatialDiff : R3 := ![y 0 - x 0, y 1 - x 1, y 2 - x 2]
+    let ws : R3 := (norm yxSpatialDiff) ^ (-1 : ℝ )  • yxSpatialDiff
+    let wsPerp : R3 := √((y 2 - x 2) ^ 2 + (x 1 - y 1) ^ 2)  • ![y 2 - x 2, x 1 - y 1, 0]
+    let zs := (((abs (y 3 - x 3)) ^ 2 / norm yxSpatialDiff) • ws) + wsPerp
+    let z := ![zs 0, zs 1, zs 2, y 3]
+    sorry
+
+theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > (x 3 - y 3) ^ 2 → x 3 = y 3 →
+            ∃ (z : R4), spaceDistanceSq z x = ( z 3 - x 3) ^ 2
+            ∧ z 3 - x 3 ≠ 0
+            ∧ ⟪ spatial z - spatial x, spatial y - spatial x ⟫ = 0 := by
+  intro x y hxyspaceLike xteqyt
+  let yxSpatialDiff : R3 := ![y 0 - x 0, y 1 - x 1, y 2 - x 2]
+  let ws : R3 := (norm yxSpatialDiff) ^ (-1 : ℝ )  • yxSpatialDiff
+  let wsPerp : R3 := (√((y 2 - x 2) ^ 2 + (x 1 - y 1) ^ 2)) ^ (-1 : ℝ)  • ![y 2 - x 2, x 1 - y 1, 0]
+  let zss : R3 := ((norm yxSpatialDiff) • wsPerp)
+  let zt : ℝ := (norm yxSpatialDiff) + x 3
+  let z : R4 := ![zss 0 + x 0, zss 1 + x 1, zss 2 + x 2, zt]
+  use z
+  constructor
+  case h.left := by
+    have h0 : z 3 - x 3 = norm yxSpatialDiff := by
+      simp [z,zt]
+    rw [h0]
+    have hzsub : spatial z - spatial x = (norm yxSpatialDiff) • wsPerp := by
+      sorry
+    have hwsPerpNorm : norm wsPerp = 1 := by
+      sorry
+    unfold spaceDistanceSq
+    rw [hzsub]
+    rw [spaceNormSqConstant (norm yxSpatialDiff) wsPerp]
+    rw [hwsPerpNorm]
+    simp
+
+  case h.right := by
+    constructor
+    case left =>
+      intro h0
+      simp [z, zt] at h0
+      rw [xteqyt] at hxyspaceLike
+      simp at hxyspaceLike
+      simp [yxSpatialDiff] at h0
+      rw [spaceDistComm x y] at hxyspaceLike
+      unfold spaceDistanceSq at hxyspaceLike
+      rw [spatialDiff y x, h0] at hxyspaceLike
+      unfold spaceNormSq at hxyspaceLike
+      simp at hxyspaceLike
+    case right =>
+      sorry
+
 
 theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → ∃ (z : R4),
   lightLike x z ∧ x ≠ z ∧ y ≠ z ∧
@@ -80,7 +147,11 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
       Collinear ℝ {x', z', w'} ∧
       lightLike w' x' ∧
       lightLike w' y' ∧
-      lightLike w' z' := sorry
+      lightLike w' z' := by sorry
+      --#print Collinear
+
+
+
     obtain ⟨w, hwEvents⟩  := axev k m iok iom w'
     have hw : lightLike w x ∧ lightLike w y ∧ lightLike w z := by
       constructor
