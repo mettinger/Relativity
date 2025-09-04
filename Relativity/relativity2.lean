@@ -62,8 +62,21 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     case pos := sorry
     case neg := sorry
 
+
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x
-  ∧ lightLike w y ∧ lightLike w z := sorry
+  ∧ lightLike w y ∧ lightLike w z := by
+    intro x y z xsZero ysZero lightLikexz
+    classical
+    let dir : Submodule ℝ R4 := Submodule.span ℝ {z - x}
+    have : FiniteDimensional ℝ dir := by infer_instance
+    let w : R4 := (orthogonalProjection dir (y - x)) + x
+    use w
+    constructor
+    case h.left := sorry
+    constructor
+    case h.right.left := sorry
+    case h.right.right := sorry
+
 
 #check dist_add_dist_eq_iff
 #check AffineSubspace.affineSpan_parallel_iff_vectorSpan_eq_and_eq_empty_iff_eq_empty
