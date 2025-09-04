@@ -31,7 +31,7 @@ theorem spatialDiff : ∀ (x y : R4), spatial x - spatial y = ![x 0 - y 0, x 1 -
   unfold spatial
   aesop
 
-theorem zExistsxtneyt : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → x 3 ≠ y 3 →
+theorem zExistsxtneyt : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → x 3 ≠ y 3 →
   ∃ (z : R4), spaceDistanceSq z x = abs ( z 3 - x 3) ^ 2
   ∧ (z 3 - x 3) ≠ 0
   ∧ z 3 = y 3
@@ -126,7 +126,7 @@ theorem lightLikeImplightLike: ∀ (x y x' y' : R4), ∀ (m k : B), IOb m → IO
       exact (eventsToWorldview p k y').mp hpInEvmy
     exact (axph k x' y' iok).mp ⟨p, ⟨hp, hwkpx', hwkpy'⟩⟩
 
-theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → ∃ (z : R4),
+theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
   lightLike x z ∧ x ≠ z ∧ y ≠ z ∧
   ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := sorry
 
@@ -135,7 +135,7 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → �
 #check AffineSubspace.affineSpan_parallel_iff_vectorSpan_eq_and_eq_empty_iff_eq_empty
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
-  ¬ spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 := by
+  ¬ spaceDistanceSq x y > timeDistanceSq x y := by
     intro m k x y ⟨hwmkx, hwmky, xney, iom, iok⟩ spaceDistGreater
     have zwExist := zExist x y spaceDistGreater
     obtain ⟨z, ⟨hxzLightlike, ⟨xnez, ynez, hwNotExist⟩⟩⟩  := zwExist
