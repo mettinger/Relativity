@@ -1,5 +1,4 @@
 import Relativity.lemmas
-
 open scoped RealInnerProductSpace
 open EuclideanSpace
 
@@ -59,8 +58,8 @@ theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > (x 3 - y 3) ^ 2 �
 
   use z
   constructor
-  case h.left := by
-    have h0 : z 3 - x 3 = norm yxSpatialDiff := by
+  case h.left := by sorry
+    /- have h0 : z 3 - x 3 = norm yxSpatialDiff := by
       simp [z,zt]
     rw [h0]
     have hzsub : spatial z - spatial x = (norm yxSpatialDiff) • wsPerp := by
@@ -82,20 +81,6 @@ theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > (x 3 - y 3) ^ 2 �
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     unfold spaceDistanceSq
     rw [hzsub]
     rw [spaceNormSqConstant (norm yxSpatialDiff) wsPerp]
@@ -114,10 +99,8 @@ theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > (x 3 - y 3) ^ 2 �
       unfold spaceDistanceSq at hxyspaceLike
       rw [spatialDiff y x, h0] at hxyspaceLike
       unfold spaceNormSq at hxyspaceLike
-      simp at hxyspaceLike
-    case right =>
-      sorry
-
+      simp at hxyspaceLike-/
+  case h.right := by sorry
 
 
 theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →
@@ -143,12 +126,13 @@ theorem lightLikeImplightLike: ∀ (x y x' y' : R4), ∀ (m k : B), IOb m → IO
       exact (eventsToWorldview p k y').mp hpInEvmy
     exact (axph k x' y' iok).mp ⟨p, ⟨hp, hwkpx', hwkpy'⟩⟩
 
-def collinear (w x y : R4) : Prop := ∃ (k : ℝ), k ≠ 0 ∧ w = k • (y - x)
-
 theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 → ∃ (z : R4),
   lightLike x z ∧ x ≠ z ∧ y ≠ z ∧
-  ∀ (w : R4), ¬ (collinear w x z ∧ lightLike w y) := sorry
+  ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := sorry
 
+
+#check dist_add_dist_eq_iff
+#check AffineSubspace.affineSpan_parallel_iff_vectorSpan_eq_and_eq_empty_iff_eq_empty
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > abs (x 3 - y 3) ^ 2 := by
@@ -184,24 +168,19 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
     have x'nez' : x' ≠ z' := x_ne_y_imp_x'_ne_y' x z x' z' xnez m k iom iok hx' hz'
     have y'nez' : y' ≠ z' := x_ne_y_imp_x'_ne_y' y z y' z' ynez m k iom iok hy' hz'
     have hx'z'Lightlike : lightLike x' z' := lightLikeImplightLike x z x' z' m k iom iok hxzLightlike hx' hz'
-    have ⟨w', ⟨hcollinearw'x'z', hllw'x', hllw'y', hllw'z'⟩⟩ : ∃ (w' : R4),
-      collinear w' x' z' ∧
+    have ⟨w', ⟨hllw'x', hllw'y', hllw'z'⟩⟩ : ∃ (w' : R4),
       lightLike w' x' ∧
       lightLike w' y' ∧
       lightLike w' z' := by sorry
-      --#print Collinear
 
-  --lightLikeImplightLike: ∀ (x y x' y' : R4), ∀ (m k : B), IOb m → IOb k →lightLike x y → events m x = events k x' -> events m y = events k y' → lightLike x' y'
+
     obtain ⟨w, hwEvents⟩  := axev k m iok iom w'
-    have hw : collinear w x z ∧ lightLike w y := by
+    have hw : lightLike w x ∧ lightLike w y ∧ lightLike w z := by
       constructor
-      case left := by
-        obtain ⟨k, hk⟩ := hcollinearw'x'z'
-        sorry
-
-
-
-
-      case right := lightLikeImplightLike w' y' w y k m iok iom hllw'y' hwEvents hy'.symm
+      case left := lightLikeImplightLike w' x' w x k m iok iom hllw'x' hwEvents hx'.symm
+      case right := by
+        constructor
+        case left := lightLikeImplightLike w' y' w y k m iok iom hllw'y' hwEvents hy'.symm
+        case right := lightLikeImplightLike w' z' w z k m iok iom hllw'z' hwEvents hz'.symm
     have hwNot := hwNotExist w
     contradiction
