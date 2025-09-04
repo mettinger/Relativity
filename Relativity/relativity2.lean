@@ -56,7 +56,7 @@ theorem lightLikeImplightLike: ∀ (x y x' y' : R4), ∀ (m k : B), IOb m → IO
 
 
 theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
-  lightLike x z ∧ ¬ Collinear ℝ {x, y, z} ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
+  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
     intro x y hsdgttd
     by_cases ht : x 3 = y 3
     case pos := sorry
@@ -65,17 +65,15 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x
   ∧ lightLike w y ∧ lightLike w z := sorry
 
-theorem collinearImpCollinear : ∀ (x y z x' y' z' : R4) (m k : B), IOb m → IOb k → events m x = events k x'
-→ events m y = events k y' → events m z = events k z' → Collinear ℝ {x, y, z} → Collinear ℝ {x', y', z'} := sorry
-
 #check dist_add_dist_eq_iff
 #check AffineSubspace.affineSpan_parallel_iff_vectorSpan_eq_and_eq_empty_iff_eq_empty
 
-theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
+theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > timeDistanceSq x y := by
-    intro m k x y ⟨hwmkx, hwmky, xney, iom, iok⟩ spaceDistGreater
+    intro m k x y ⟨hwmkx, hwmky, iom, iok⟩ spaceDistGreater
     have zwExist := zExist x y spaceDistGreater
-    obtain ⟨z, ⟨hxzLightlike, ⟨hnColxyz, hwNotExist⟩⟩⟩  := zwExist
+    obtain ⟨z, ⟨hxzLightlike, hwNotExist⟩⟩  := zwExist
+    --obtain ⟨z, ⟨hxzLightlike, ⟨hnColxyz, hwNotExist⟩⟩⟩  := zwExist
     obtain ⟨x', hx'⟩ := axev m k iom iok x
     obtain ⟨y', hy'⟩ := axev m k iom iok y
     obtain ⟨z', hz'⟩ := axev m k iom iok z
@@ -122,14 +120,29 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
     contradiction
 
 /-
+theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
+  lightLike x z ∧ ¬ Collinear ℝ {x, y, z} ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
+    intro x y hsdgttd
+    by_cases ht : x 3 = y 3
+    case pos := sorry
+    case neg := sorry
+-/
+
+/-
+theorem collinearImpCollinear : ∀ (x y z x' y' z' : R4) (m k : B), IOb m → IOb k → events m x = events k x'
+→ events m y = events k y' → events m z = events k z' → Collinear ℝ {x, y, z} → Collinear ℝ {x', y', z'} := sorry
+-/
+
+/-
     have xnez : x ≠ z := sorry
     have ynez : y ≠ z := sorry
     have x'ney' : x' ≠ y' := x_ne_y_imp_x'_ne_y' x y x' y' xney m k iom iok hx' hy'
     have x'nez' : x' ≠ z' := x_ne_y_imp_x'_ne_y' x z x' z' xnez m k iom iok hx' hz'
     have y'nez' : y' ≠ z' := x_ne_y_imp_x'_ne_y' y z y' z' ynez m k iom iok hy' hz'
-    -/
+-/
 
-  /-theorem zExistsxtneyt : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → x 3 ≠ y 3 →
+/-
+theorem zExistsxtneyt : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → x 3 ≠ y 3 →
   ∃ (z : R4), spaceDistanceSq z x = abs ( z 3 - x 3) ^ 2
   ∧ (z 3 - x 3) ≠ 0
   ∧ z 3 = y 3
@@ -138,4 +151,5 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
 theorem zExistsxteqyt : ∀ (x y : R4), spaceDistanceSq x y > (x 3 - y 3) ^ 2 → x 3 = y 3 →
             ∃ (z : R4), spaceDistanceSq z x = ( z 3 - x 3) ^ 2
             ∧ z 3 - x 3 ≠ 0
-            ∧ ⟪ spatial z - spatial x, spatial y - spatial x ⟫ = 0 := by sorry -/
+            ∧ ⟪ spatial z - spatial x, spatial y - spatial x ⟫ = 0 := by sorry
+-/
