@@ -1,4 +1,4 @@
-import Relativity.definitions
+import relativity.definitions
 
 theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ W ob b x := by
   intro b ob x
