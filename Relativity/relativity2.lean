@@ -69,8 +69,10 @@ theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
     classical
     let dir : Submodule ℝ R4 := Submodule.span ℝ {z - x}
     have : FiniteDimensional ℝ dir := by infer_instance
-    let w : R4 := (orthogonalProjection dir (y - x)) + x
+    let w : R4 := (starProjection dir (y - x)) + x
     use w
+    #check Submodule.orthogonalProjection
+    #check orthogonalProjectionFn_mem (w : R4)
     constructor
     case h.left := sorry
     constructor
