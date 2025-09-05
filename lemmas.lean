@@ -1,10 +1,5 @@
 import Relativity.definitions
 
-theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ W ob b x := by
-  intro b ob x
-  rw [events]
-  simp
-
 theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
   lightLike x y → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
     intro m x y iom ytgtxt onLightcone
@@ -70,57 +65,6 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     exact (ne_of_gt ytgtxt) hyeqxtime
 
 
-theorem sp_tm_eq_eq : ∀ (x y: R4), spaceDistanceSq x y = 0 → x 3 = y 3 → x = y := by
-  intro x y hsp htime
-  have hsum := hsp
-  unfold spaceDistanceSq at hsum
-  unfold spatial at hsum
-  unfold spaceNormSq at hsum
-  simp at hsum
-  -- Now hsum : (x 0 - y 0) ^ 2 + (x 1 - y 1) ^ 2 + (x 2 - y 2) ^ 2 = 0
-  -- Derive each spatial coordinate equal
-  have hx0sq : (x 0 - y 0) ^ 2 = 0 := by
-    have heq : (x 0 - y 0) ^ 2 = - ((x 1 - y 1) ^ 2 + (x 2 - y 2) ^ 2) := by
-      linarith [hsum]
-    have a_nonpos : (x 0 - y 0) ^ 2 ≤ 0 := by
-      have : 0 ≤ (x 1 - y 1) ^ 2 + (x 2 - y 2) ^ 2 := add_nonneg (sq_nonneg _) (sq_nonneg _)
-      have : - ((x 1 - y 1) ^ 2 + (x 2 - y 2) ^ 2) ≤ 0 := by linarith
-      simpa [heq]
-    exact le_antisymm a_nonpos (sq_nonneg _)
-  have hx1sq : (x 1 - y 1) ^ 2 = 0 := by
-    have heq : (x 1 - y 1) ^ 2 = - ((x 0 - y 0) ^ 2 + (x 2 - y 2) ^ 2) := by
-      linarith [hsum]
-    have a_nonpos : (x 1 - y 1) ^ 2 ≤ 0 := by
-      have : 0 ≤ (x 0 - y 0) ^ 2 + (x 2 - y 2) ^ 2 := add_nonneg (sq_nonneg _) (sq_nonneg _)
-      have : - ((x 0 - y 0) ^ 2 + (x 2 - y 2) ^ 2) ≤ 0 := by linarith
-      simpa [heq]
-    exact le_antisymm a_nonpos (sq_nonneg _)
-  have hx2sq : (x 2 - y 2) ^ 2 = 0 := by
-    have heq : (x 2 - y 2) ^ 2 = - ((x 0 - y 0) ^ 2 + (x 1 - y 1) ^ 2) := by
-      linarith [hsum]
-    have a_nonpos : (x 2 - y 2) ^ 2 ≤ 0 := by
-      have : 0 ≤ (x 0 - y 0) ^ 2 + (x 1 - y 1) ^ 2 := add_nonneg (sq_nonneg _) (sq_nonneg _)
-      have : - ((x 0 - y 0) ^ 2 + (x 1 - y 1) ^ 2) ≤ 0 := by linarith
-      simpa [heq]
-    exact le_antisymm a_nonpos (sq_nonneg _)
-  have hx0 : x 0 = y 0 := by
-    have := (sq_eq_zero_iff).1 hx0sq
-    simpa [sub_eq_zero] using this
-  have hx1 : x 1 = y 1 := by
-    have := (sq_eq_zero_iff).1 hx1sq
-    simpa [sub_eq_zero] using this
-  have hx2 : x 2 = y 2 := by
-    have := (sq_eq_zero_iff).1 hx2sq
-    simpa [sub_eq_zero] using this
-  ext i ; fin_cases i <;> simp [hx0, hx1, hx2, htime]
-
-theorem spaceDistComm : ∀ (x y: R4), spaceDistanceSq x y = spaceDistanceSq y x := by
-  intro x y
-  unfold spaceDistanceSq
-  unfold spatial
-  unfold spaceNormSq
-  simp
-  ring
 
 theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by
   intro x y b iobb xney events_eq
@@ -173,12 +117,3 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events
           have pEVbx : p ∈ events b x := by simpa [events_eq] using pEVby
           exact (eventsToWorldview p b x).mp pEVbx
         exact hnwbpx h
-
-/-
-theorem x_eq_y_eq_events : ∀ (x y : R4), ∀ (ob : B), x = y → events ob x = events ob y := by
-  intro x y ob xeqy
-  ext ob
-  unfold events
-  simp
-  rw [xeqy]
--/
