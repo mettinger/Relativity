@@ -19,7 +19,7 @@ def spaceNormSq (p : R3) : ℝ := p 0 ^ 2 + p 1 ^ 2 + p 2 ^ 2
 
 -- compute the spatial distance between two 4d points
 def spaceDistanceSq (p q : R4) : ℝ := spaceNormSq ((spatial p) - (spatial q))
-def timeDistanceSq (p q : R4) : ℝ := (p 3 - q 3) ^ 3
+def timeDistanceSq (p q : R4) : ℝ := (p 3 - q 3) ^ 2
 
 def lightLike (p q : R4) := spaceDistanceSq p q = timeDistanceSq p q
 
@@ -36,7 +36,7 @@ def wl (m b : B) : Set R4 := {x | W m b x} -- worldline of b as viewed by m
 -- AXIOM 1: "For any inertial observer, the speed of light is 1. Furthermore, it is possible to send out a light signal in any direction."
 
 axiom axph : ∀ (m : B), ∀ (x y : R4), IOb m →
-  ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = abs (x 3 - y 3) ^2))
+  ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = timeDistanceSq x y))
 
 -- END AXIOM
 

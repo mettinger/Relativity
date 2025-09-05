@@ -1,4 +1,4 @@
-import relativity.lemmas
+import Relativity.lemmas
 
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by

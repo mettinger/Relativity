@@ -1,4 +1,4 @@
-import relativity.definitions
+import Relativity.definitions
 
 theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ W ob b x := by
   intro b ob x
@@ -6,7 +6,7 @@ theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ 
   simp
 
 theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
-  spaceDistanceSq x y = abs (y 3 - x 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
+  lightLike x y → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
     intro m x y iom ytgtxt onLightcone
     let yOpp : R4 :=
       fun n : Fin 4 =>

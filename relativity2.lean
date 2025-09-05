@@ -1,4 +1,4 @@
-import relativity.lemmas
+import Relativity.lemmas2
 open scoped RealInnerProductSpace
 open EuclideanSpace
 
@@ -58,6 +58,7 @@ theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ
 theorem lightLikeSymm : ∀ (x y : R4), lightLike x y → lightLike y x := by
   intro x y hllxy
   unfold lightLike at *
+  sorry
 
 
 
