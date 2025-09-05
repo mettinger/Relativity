@@ -53,21 +53,45 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     case neg := sorry
 
 
-theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x
-  ∧ lightLike w y ∧ lightLike w z := by
+theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ ({x, z} : Set R4) → lightLike x y := sorry
+
+theorem lightLikeSymm : ∀ (x y : R4), lightLike x y → lightLike y x := by
+  intro x y
+  unfold lightLike
+  sorry
+
+theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
     intro x y z xsZero ysZero lightLikexz
-    classical
+    --classical
+
+    /-
     let dir : Submodule ℝ R4 := Submodule.span ℝ {z - x}
-    have : FiniteDimensional ℝ dir := by infer_instance
-    let w : R4 := (Submodule.orthogonalProjection dir (y - x)) + x
+    let w : R4 := (Submodule.orthogonalProjection dir (y - x))
+    have hwInxzLine := dir.orthogonalProjectionFn_mem w
+    -/
+
+    let dir := affineSpan ℝ ({x, z} : Set R4)
+    let w := EuclideanGeometry.orthogonalProjection dir (y - x)
+    have hwInDir := EuclideanGeometry.orthogonalProjection_mem (s := dir) (p := y - x)
+
     use w
-    #check Submodule.starProjection
-    #check Submodule.orthogonalProjectionFn_mem (w : R4)
     constructor
-    case h.left := sorry
+    case h.left := (lightLikeSymm x w) (lightLikeSpan x w z lightLikexz hwInDir)
     constructor
+    case h.right.right := by
+      have : ({x, z} : Set R4) = ({z, x} : Set R4) := by apply Set.pair_comm
+      have : affineSpan ℝ ({x, z} : Set R4) = affineSpan ℝ ({z, x} : Set R4) := by
+        rw [← this]
+      have : ↑w ∈ affineSpan ℝ {z, x} := by
+        conv =>
+          congr
+          rw [← this]
+          rfl
+        apply hwInDir
+      exact (lightLikeSymm z w) (lightLikeSpan z w x ((lightLikeSymm x z) lightLikexz) this)
     case h.right.left := sorry
-    case h.right.right := sorry
+
+
 
 
 #check dist_add_dist_eq_iff
