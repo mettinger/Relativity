@@ -56,24 +56,18 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
 theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ ({x, z} : Set R4) → lightLike x y := sorry
 
 theorem lightLikeSymm : ∀ (x y : R4), lightLike x y → lightLike y x := by
-  intro x y
-  unfold lightLike
-  sorry
+  intro x y hllxy
+  unfold lightLike at *
+
+
+
 
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
     intro x y z xsZero ysZero lightLikexz
-    --classical
-
-    /-
-    let dir : Submodule ℝ R4 := Submodule.span ℝ {z - x}
-    let w : R4 := (Submodule.orthogonalProjection dir (y - x))
-    have hwInxzLine := dir.orthogonalProjectionFn_mem w
-    -/
 
     let dir := affineSpan ℝ ({x, z} : Set R4)
     let w := EuclideanGeometry.orthogonalProjection dir (y - x)
     have hwInDir := EuclideanGeometry.orthogonalProjection_mem (s := dir) (p := y - x)
-
     use w
     constructor
     case h.left := (lightLikeSymm x w) (lightLikeSpan x w z lightLikexz hwInDir)
@@ -90,8 +84,6 @@ theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
         apply hwInDir
       exact (lightLikeSymm z w) (lightLikeSpan z w x ((lightLikeSymm x z) lightLikexz) this)
     case h.right.left := sorry
-
-
 
 
 #check dist_add_dist_eq_iff
