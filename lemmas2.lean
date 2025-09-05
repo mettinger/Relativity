@@ -24,7 +24,9 @@ theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ 
   simp
 
 theorem timeDistanceComm : ∀ (x y : R4), timeDistanceSq x y = timeDistanceSq y x := by
-  sorry
+  intro x y
+  unfold timeDistanceSq
+  ring
 
 theorem spaceDistanceComm : ∀ (x y: R4), spaceDistanceSq x y = spaceDistanceSq y x := by
   intro x y
@@ -40,16 +42,6 @@ theorem lightLikeSymm : ∀ (x y : R4), lightLike x y → lightLike y x := by
   rw [← spaceDistanceComm x y]
   rw [← timeDistanceComm x y]
   assumption
-
-theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by sorry
-
-theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →
-  ∀ (m k : B), IOb m → IOb k → events m x = events k x' → events m y = events k y' → x' ≠ y' := by
-    intro x y x' y' hxney m k iom _ hxx'EventsEq hyy'EventsEq hx'eqy'
-    rw [← hx'eqy'] at hyy'EventsEq
-    rw [← hyy'EventsEq] at hxx'EventsEq
-    have hxx'EventsNotEq := x_ne_y_evx_ne_evy x y m iom hxney
-    exact hxx'EventsNotEq hxx'EventsEq
 
 theorem lightLikeImplightLike: ∀ (x y x' y' : R4), ∀ (m k : B), IOb m → IOb k →
   lightLike x y → events m x = events k x' -> events m y = events k y' → lightLike x' y' := by

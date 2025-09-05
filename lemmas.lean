@@ -64,8 +64,17 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     have hyeqxtime : y 3 = x 3 := sub_eq_zero.mp htime_eq
     exact (ne_of_gt ytgtxt) hyeqxtime
 
+theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by sorry
 
+theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →
+  ∀ (m k : B), IOb m → IOb k → events m x = events k x' → events m y = events k y' → x' ≠ y' := by
+    intro x y x' y' hxney m k iom _ hxx'EventsEq hyy'EventsEq hx'eqy'
+    rw [← hx'eqy'] at hyy'EventsEq
+    rw [← hyy'EventsEq] at hxx'EventsEq
+    have hxx'EventsNotEq := x_ne_y_evx_ne_evy x y m iom hxney
+    exact hxx'EventsNotEq hxx'EventsEq
 
+/-
 theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by
   intro x y b iobb xney events_eq
   by_cases spatialDistance : spaceDistanceSq x y = abs (x 3 - y 3) ^ 2
@@ -117,3 +126,4 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events
           have pEVbx : p ∈ events b x := by simpa [events_eq] using pEVby
           exact (eventsToWorldview p b x).mp pEVbx
         exact hnwbpx h
+-/
