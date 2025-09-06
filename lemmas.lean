@@ -1,8 +1,9 @@
 import Relativity.definitions
+import Relativity.lemmas2
 
 theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
-  lightLike x y → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by sorry
-  /-
+  spaceDistanceSq x y = (x 3 - y 3) ^ 2 → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
+
     intro m x y iom ytgtxt onLightcone
     let yOpp : R4 :=
       fun n : Fin 4 =>
@@ -22,7 +23,7 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     rw [sDistyyOppEq] at onLightcone
     have : y 3 = yOpp 3 := rfl
     rw [this] at onLightcone
-    rw [abs_sub_comm] at onLightcone
+    --rw [abs_sub_comm] at onLightcone
     have h0 := h0 onLightcone
     obtain ⟨p, hp, hwmpx, hmpyopp⟩ := h0
     use p
@@ -65,26 +66,18 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     have hyeqxtime : y 3 = x 3 := sub_eq_zero.mp htime_eq
     exact (ne_of_gt ytgtxt) hyeqxtime
 
--/
-theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by sorry
 
-theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →
-  ∀ (m k : B), IOb m → IOb k → events m x = events k x' → events m y = events k y' → x' ≠ y' := by
-    intro x y x' y' hxney m k iom _ hxx'EventsEq hyy'EventsEq hx'eqy'
-    rw [← hx'eqy'] at hyy'EventsEq
-    rw [← hyy'EventsEq] at hxx'EventsEq
-    have hxx'EventsNotEq := x_ne_y_evx_ne_evy x y m iom hxney
-    exact hxx'EventsNotEq hxx'EventsEq
 
-/-
+
+
 theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by
   intro x y b iobb xney events_eq
-  by_cases spatialDistance : spaceDistanceSq x y = abs (x 3 - y 3) ^ 2
+  by_cases spatialDistance : spaceDistanceSq x y = (x 3 - y 3) ^ 2
   case neg =>
     have photonExists : ∃ (p : B), Ph p ∧ W b p x := by
       have h := (axph b x x iobb).2
-      simp at h
       unfold spaceDistanceSq at h
+      unfold timeDistanceSq at h
       simp at h
       unfold spaceNormSq at h
       simp at h
@@ -105,7 +98,6 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events
     cases lt_trichotomy (x 3) (y 3)
     case inl =>
       rename_i xtltyt
-      rw [abs_sub_comm] at spatialDistance
       have ⟨p, _, hwbpx, hnwbpy⟩ := oppDirection b x y iobb xtltyt spatialDistance
       have h : W b p y := by
         have pEVbx : p ∈ events b x := (eventsToWorldview p b x).mpr hwbpx
@@ -121,11 +113,20 @@ theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events
         have xeqy : x = y := sp_tm_eq_eq x y spatialDistance xteqyt
         contradiction
       case inr =>
-        rw [spaceDistComm] at spatialDistance
+        rw [spaceDistanceComm] at spatialDistance
+        rw [← neg_sub] at spatialDistance
+        rw [neg_pow_two] at spatialDistance
         have ⟨p, _, hwbpy, hnwbpx⟩ := oppDirection b y x iobb ytltxt spatialDistance
         have h : W b p x := by
           have pEVby : p ∈ events b y := (eventsToWorldview p b y).mpr hwbpy
           have pEVbx : p ∈ events b x := by simpa [events_eq] using pEVby
           exact (eventsToWorldview p b x).mp pEVbx
         exact hnwbpx h
--/
+
+theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →
+  ∀ (m k : B), IOb m → IOb k → events m x = events k x' → events m y = events k y' → x' ≠ y' := by
+    intro x y x' y' hxney m k iom _ hxx'EventsEq hyy'EventsEq hx'eqy'
+    rw [← hx'eqy'] at hyy'EventsEq
+    rw [← hyy'EventsEq] at hxx'EventsEq
+    have hxx'EventsNotEq := x_ne_y_evx_ne_evy x y m iom hxney
+    exact hxx'EventsNotEq hxx'EventsEq

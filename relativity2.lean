@@ -15,7 +15,7 @@ theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ
   → lightLike x y := by
     intro x y z hllxz hyInSpan
     unfold lightLike at *
-    
+    sorry
 
 
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
