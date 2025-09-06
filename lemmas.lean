@@ -21,8 +21,8 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
       simp [yOpp]
       ring
     rw [sDistyyOppEq] at onLightcone
-    have : y 3 = yOpp 3 := rfl
-    rw [this] at onLightcone
+    have hyt: y 3 = yOpp 3 := rfl
+    rw [hyt] at onLightcone
     --rw [abs_sub_comm] at onLightcone
     have h0 := h0 onLightcone
     obtain ⟨p, hp, hwmpx, hmpyopp⟩ := h0
@@ -31,11 +31,13 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     exact hp
     constructor
     exact hwmpx
-
     intro wmpy
     have sd_y_yOpp := (axph m y yOpp iom).1 ⟨p, hp, wmpy, hmpyopp⟩
     have sd_y_yOpp_zero : spaceDistanceSq y yOpp = 0 := by
-      simpa [yOpp] using sd_y_yOpp
+      rw [sd_y_yOpp]
+      unfold timeDistanceSq
+      rw [hyt]
+      simp
     have calcDist : spaceDistanceSq y yOpp = 4 * spaceDistanceSq x y := by
       unfold spaceDistanceSq
       unfold spatial
@@ -51,9 +53,9 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     --have abs_eq : abs (y 3 - x 3) = y 3 - x 3 := abs_of_pos pos_time
     have hsq : (y 3 - x 3) ^ 2 = 0 := by
       have onL := onLightcone
-      rw [← this] at onL
-      rw [← sq_abs]
-      rw [abs_sub_comm]
+      rw [← hyt] at onL
+      --rw [← sq_abs]
+      --rw [abs_sub_comm]
       have yyOppSpaceDist : spaceDistanceSq x y = spaceDistanceSq x yOpp := by
         unfold spaceDistanceSq
         unfold spatial
@@ -61,14 +63,12 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
         simp
         ring
       rw [← yyOppSpaceDist, sxy_zero] at onL
+      rw [← neg_sub] at onL
+      rw [neg_pow_two] at onL
       exact onL.symm
     have htime_eq : y 3 - x 3 = 0 := (sq_eq_zero_iff).1 hsq
     have hyeqxtime : y 3 = x 3 := sub_eq_zero.mp htime_eq
     exact (ne_of_gt ytgtxt) hyeqxtime
-
-
-
-
 
 theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by
   intro x y b iobb xney events_eq
