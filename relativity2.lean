@@ -11,7 +11,11 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     case neg := sorry
 
 
-theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ ({x, z} : Set R4) → lightLike x y := sorry
+theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ ({x, z} : Set R4)
+  → lightLike x y := by
+    intro x y z hllxz hyInSpan
+    unfold lightLike at *
+    
 
 
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
