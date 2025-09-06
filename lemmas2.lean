@@ -101,3 +101,61 @@ theorem sp_tm_eq_eq : ∀ (x y: R4), spaceDistanceSq x y = 0 → x 3 = y 3 → x
     have := (sq_eq_zero_iff).1 hx2sq
     simpa [sub_eq_zero] using this
   ext i ; fin_cases i <;> simp [hx0, hx1, hx2, htime]
+
+theorem spanNeg {V : Type*} [AddCommGroup V] [Module ℝ V] (v : V) : Submodule.span ℝ {v} = Submodule.span ℝ {-v} := by
+  rw [← Submodule.span_neg]
+  simp
+
+theorem affineSpanDef : ∀ (x y z : R4), y ∈ affineSpan ℝ ({x, z} : Set R4) → ∃ (k : ℝ), y = x + (k • (z- x)) := by
+  classical
+  intro x y z hy
+  have hx : x ∈ affineSpan ℝ ({x, z} : Set R4) :=
+    (subset_affineSpan (k := ℝ) (s := ({x, z} : Set R4))) (by simp)
+  have hdir : y - x ∈ (affineSpan ℝ ({x, z} : Set R4)).direction := by
+    simpa using (AffineSubspace.vsub_mem_direction hy hx)
+  have hspan : y - x ∈ Submodule.span ℝ ({z - x} : Set R4) := by
+    have : ∀ (x y : R4), Submodule.span ℝ {y - x} = Submodule.span ℝ {x - y} := by
+      intro x y
+      rw [← neg_sub]
+      rw [← spanNeg]
+    simpa [direction_affineSpan, vectorSpan_pair, this] using hdir
+  rcases Submodule.mem_span_singleton.mp hspan with ⟨k, hk⟩
+  refine ⟨k, ?_⟩
+  have : y = k • (z - x) + x := by
+    have := congrArg (fun v : R4 => v + x) hk
+    simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this.symm
+  simpa [add_comm] using this
+
+
+theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ ({x, z} : Set R4)
+  → lightLike x y := by
+    intro x y z hllxz hyInSpan
+    have ⟨k, hk⟩ : ∃ (k : ℝ), y = x + (k • (z- x)) := affineSpanDef x y z hyInSpan
+
+    unfold lightLike at *
+    have hxySpace: spaceDistanceSq x y = k^2 * spaceDistanceSq x z := by
+      unfold spaceDistanceSq
+      unfold spaceNormSq
+      have : spatial y = spatial x + (k • spatial z) - (k • spatial x) := by
+        unfold spatial
+        rw [hk]
+        ext i
+        simp
+        rw [mul_sub k (z 0) (x 0),mul_sub k (z 1) (x 1),mul_sub k (z 2) (x 2)]
+        rw [← add_sub_assoc]
+        rw [← add_sub_assoc]
+        rw [← add_sub_assoc]
+        aesop
+      rw [this]
+      unfold spatial
+      simp
+      ring
+    have hxyTime: timeDistanceSq x y = k^2 * timeDistanceSq x z := by
+      unfold timeDistanceSq
+      have : y 3 = x 3 + (k * z 3) - (k * x 3) := by
+        rw [hk]
+        simp
+        ring
+      rw [this]
+      ring
+    rw [hxySpace, hxyTime, hllxz]
