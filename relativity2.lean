@@ -14,8 +14,27 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
 theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ ({x, z} : Set R4)
   → lightLike x y := by
     intro x y z hllxz hyInSpan
+    have ⟨k, hk⟩ : ∃ (k : ℝ), y = x + (k • (z- x)) := by sorry
+      --unfold affineSpan at *
+      --unfold spanPoints at *
     unfold lightLike at *
-    sorry
+    have hxySpace: spaceDistanceSq x y = k^2 * spaceDistanceSq x z := by
+      unfold spaceDistanceSq
+      unfold spaceNormSq
+      have : spatial y = spatial x + (k • spatial z) - (k • spatial x) := sorry
+      rw [this]
+      unfold spatial
+      simp
+      ring
+    have hxyTime: timeDistanceSq x y = k^2 * timeDistanceSq x z := by
+      unfold timeDistanceSq
+      have : y 3 = x 3 + (k * z 3) - (k * x 3) := by
+        rw [hk]
+        simp
+        ring
+      rw [this]
+      ring
+    rw [hxySpace, hxyTime, hllxz]
 
 
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] → lightLike x z → ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
@@ -93,9 +112,6 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
         case right := lightLikeImplightLike w' z' w z k m iok iom hllw'z' hwEvents hz'.symm
     have hwNot := hwNotExist w
     contradiction
-
-
-
 
 /-
 theorem spaceNormSqConstant : ∀ (c : ℝ) (v : R3), spaceNormSq (c • v) = (c ^ 2) * (norm v) ^ 2 := by
