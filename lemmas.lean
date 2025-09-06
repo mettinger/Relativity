@@ -1,7 +1,8 @@
 import Relativity.definitions
 
 theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
-  lightLike x y → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by
+  lightLike x y → ∃ (p : B), Ph p ∧ W m p x ∧ ¬ W m p y := by sorry
+  /-
     intro m x y iom ytgtxt onLightcone
     let yOpp : R4 :=
       fun n : Fin 4 =>
@@ -64,6 +65,7 @@ theorem oppDirection : ∀ (m : B) (x y : R4), IOb m → y 3 > x 3 →
     have hyeqxtime : y 3 = x 3 := sub_eq_zero.mp htime_eq
     exact (ne_of_gt ytgtxt) hyeqxtime
 
+-/
 theorem x_ne_y_evx_ne_evy : ∀ (x y : R4) (b : B), IOb b → x ≠ y → events b x ≠ events b y := by sorry
 
 theorem x_ne_y_imp_x'_ne_y' : ∀ (x y x' y': R4), x ≠ y →

@@ -1,7 +1,8 @@
 import Relativity.lemmas
+import Relativity.lemmas2
 
 theorem notLightSpeed : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧ IOb m ∧ IOb k →
-  ¬ spaceDistanceSq x y = abs (x 3 - y 3) ^ 2 := by
+  ¬ spaceDistanceSq x y = timeDistanceSq x y := by
     intro m k x y ⟨mkx, mky, xney, iom, iok⟩ lightSpeed
     have  ⟨p, ⟨pph, mpx, mpy⟩⟩ : ∃ p, Ph p ∧ W m p x ∧ W m p y := (axph m x y iom).mpr lightSpeed
     have pEVmx : p ∈ events m x := by
@@ -71,17 +72,18 @@ theorem notLightSpeed : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x
       have pWkx' : W k p x' := (eventsToWorldview p k x').mp pEVkx'
       have pWky' : W k p y' := (eventsToWorldview p k y').mp pEVky'
       have photon_k : ∃ p₀, Ph p₀ ∧ W k p₀ x' ∧ W k p₀ y' := ⟨p, pph, pWkx', pWky'⟩
-      have lightspeed_k : spaceDistanceSq x' y' = abs (x' 3 - y' 3) ^ 2 :=
+      have lightspeed_k : spaceDistanceSq x' y' = timeDistanceSq x' y' :=
         (axph k x' y' iok).mp photon_k
-      have h0 : 0 = abs (x' 3 - y' 3) ^ 2 :=
-        Eq.trans spacedistSqx'y'0.symm lightspeed_k
-      have habs0 : abs (x' 3 - y' 3) ^ 2 = 0 := h0.symm
-      have habs : abs (x' 3 - y' 3) = 0 := by
-        have : abs (x' 3 - y' 3) * abs (x' 3 - y' 3) = 0 := by
-          simpa [pow_two] using habs0
+      have  : 0 = (x' 3 - y' 3) ^ 2 := by
+        have := Eq.trans spacedistSqx'y'0.symm lightspeed_k
+        unfold timeDistanceSq at this
+        exact this
+      have  : (x' 3 - y' 3) ^ 2 = 0 := this.symm
+      have  : (x' 3 - y' 3) = 0 := by
+        have : (x' 3 - y' 3) * (x' 3 - y' 3) = 0 := by
+          simpa [pow_two] using this
         exact mul_self_eq_zero.mp this
-      have diff0 : x' 3 - y' 3 = 0 := abs_eq_zero.mp habs
-      exact sub_eq_zero.mp diff0
+      exact sub_eq_zero.mp this
 
     have x'eqy' : x' = y' := by
       have hx0 : x' 0 = 0 := by
