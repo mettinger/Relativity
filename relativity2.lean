@@ -3,12 +3,14 @@ open scoped RealInnerProductSpace
 open EuclideanSpace
 
 
-theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
-  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
-    intro x y hsdgttd
-    by_cases ht : x 3 = y 3
-    case pos := sorry
-    case neg := sorry
+theorem equalTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 = y 3
+  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
+
+theorem ltTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 < y 3
+  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
+
+theorem gtTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 > y 3
+  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
 
 #check dist_add_dist_eq_iff
 #check AffineSubspace.affineSpan_parallel_iff_vectorSpan_eq_and_eq_empty_iff_eq_empty
@@ -37,9 +39,16 @@ theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
       exact (lightLikeSymm z w) (lightLikeSpan z w x ((lightLikeSymm x z) lightLikexz) this)
     case h.right.left := by
       unfold lightLike
+      sorry
 
 
-
+theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
+  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
+    intro x y hsdgttd
+    rcases lt_trichotomy (x 3) (y 3) with hlt | heq | hgt
+    case inl := ltTimeZExist x y hsdgttd hlt
+    case inr.inl := equalTimeZExist x y hsdgttd heq
+    case inr.inr := gtTimeZExist x y hsdgttd hgt
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > timeDistanceSq x y := by
