@@ -2,18 +2,36 @@ import Relativity.lemmas2
 open scoped RealInnerProductSpace
 open EuclideanSpace
 
-
-theorem equalTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 = y 3
-  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
-
-theorem ltTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 < y 3
-  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
-
-theorem gtTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 > y 3
-  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
-
 #check dist_add_dist_eq_iff
 #check AffineSubspace.affineSpan_parallel_iff_vectorSpan_eq_and_eq_empty_iff_eq_empty
+#check AffineSubspace.ext_of_direction_eq
+#check AffineSubspace.eq_iff_direction_eq_of_mem
+#check AffineSubspace.ext_of_direction_eq
+
+theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
+  ∃ (z : R4), lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
+
+theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
+  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
+    intro x y hsdgttd
+    have := tangentPlaneToCone x y hsdgttd
+    obtain ⟨z, ⟨hllxz, hparallel⟩⟩  := this
+    use z
+    constructor
+    exact hllxz
+    by_contra hw
+    push_neg at hw
+    obtain ⟨w,⟨hllwx, hllwy, hllwz⟩ ⟩ := hw
+    have hwxyz := hparallel w y
+    have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := sorry
+    have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := sorry
+    have hAffineParalel := hwxyz haffineSub hllwy
+    --comment
+
+
+
+
+
 
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
   → lightLike x z → ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
@@ -40,15 +58,6 @@ theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
     case h.right.left := by
       unfold lightLike
       sorry
-
-
-theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
-  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
-    intro x y hsdgttd
-    rcases lt_trichotomy (x 3) (y 3) with hlt | heq | hgt
-    case inl := ltTimeZExist x y hsdgttd hlt
-    case inr.inl := equalTimeZExist x y hsdgttd heq
-    case inr.inr := gtTimeZExist x y hsdgttd hgt
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > timeDistanceSq x y := by
@@ -98,3 +107,23 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
         case right := lightLikeImplightLike w' z' w z k m iok iom hllw'z' hwEvents hz'.symm
     have hwNot := hwNotExist w
     contradiction
+
+/-
+theorem equalTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 = y 3
+  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
+
+theorem ltTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 < y 3
+  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
+
+theorem gtTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 > y 3
+  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
+
+
+theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
+  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
+    intro x y hsdgttd
+    rcases lt_trichotomy (x 3) (y 3) with hlt | heq | hgt
+    case inl := ltTimeZExist x y hsdgttd hlt
+    case inr.inl := equalTimeZExist x y hsdgttd heq
+    case inr.inr := gtTimeZExist x y hsdgttd hgt
+-/
