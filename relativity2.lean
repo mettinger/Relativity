@@ -26,7 +26,7 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := sorry
     have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := sorry
     have hAffineParalel := hwxyz haffineSub hllwy
-    --comment
+    sorry
 
 
 
