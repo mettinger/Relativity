@@ -165,23 +165,3 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
         case right := lightLikeImplightLike w' z' w z k m iok iom hllw'z' hwEvents hz'.symm
     have hwNot := hwNotExist w
     contradiction
-
-/-
-theorem equalTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 = y 3
-  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
-
-theorem ltTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 < y 3
-  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
-
-theorem gtTimeZExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y -> x 3 > y 3
-  → ∃ (z : R4), lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z)  := sorry
-
-
-theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
-  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
-    intro x y hsdgttd
-    rcases lt_trichotomy (x 3) (y 3) with hlt | heq | hgt
-    case inl := ltTimeZExist x y hsdgttd hlt
-    case inr.inl := equalTimeZExist x y hsdgttd heq
-    case inr.inr := gtTimeZExist x y hsdgttd hgt
--/
