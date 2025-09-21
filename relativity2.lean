@@ -164,4 +164,4 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
         case left := lightLikeImplightLike w' y' w y k m iok iom hllw'y' hwEvents hy'.symm
         case right := lightLikeImplightLike w' z' w z k m iok iom hllw'z' hwEvents hz'.symm
     have hwNot := hwNotExist w
-    contradiction
+    contradictio
