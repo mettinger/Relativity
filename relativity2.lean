@@ -23,10 +23,68 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     push_neg at hw
     obtain ⟨w,⟨hllwx, hllwy, hllwz⟩ ⟩ := hw
     have hwxyz := hparallel w y
+
     have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := sorry
-    have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := sorry
-    have hAffineParalel := hwxyz haffineSub hllwy
-    sorry
+    have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := by
+
+      have : {w,y}  ⊆ ((affineSpan ℝ {x, y, z}) : Set R4) := by
+        simp only [Set.insert_subset_iff]
+        constructor
+        have hle :
+            affineSpan ℝ ({x, z} : Set R4) ≤
+              affineSpan ℝ ({x, y, z} : Set R4) := by
+          apply affineSpan_mono
+          intro t ht
+          have hxz : t = x ∨ t = z := by
+            simpa [Set.mem_insert_iff, Set.mem_singleton_iff] using ht
+          rcases hxz with rfl | rfl
+          · simp [Set.mem_insert_iff, Set.mem_singleton_iff]
+          · simp [Set.mem_insert_iff, Set.mem_singleton_iff]
+        exact hle hwInxzSpan
+
+        have hy_mem : y ∈ (affineSpan ℝ {x, y, z}) := by
+          have : y ∈ ({x,y,z} : Set R4) := by simp
+          apply mem_affineSpan ℝ this
+
+        simpa [Set.singleton_subset_iff] using hy_mem
+
+
+
+
+    have hAffineParallel := hwxyz haffineSub hllwy
+    apply AffineSubspace.Parallel.direction_eq at hAffineParallel
+
+    have hn : ((affineSpan ℝ {w, y} : Set R4) ∩ (affineSpan ℝ {x, z} : Set R4)).Nonempty := by
+      use w
+      constructor
+      have : w ∈ ({w,y} : Set R4) := by simp
+      have := mem_spanPoints ℝ w {w,y} this
+      assumption
+      assumption
+    have hAffinesEqual := AffineSubspace.ext_of_direction_eq hAffineParallel hn
+    have : affineSpan ℝ {w, y} = affineSpan ℝ {x, z} → spanPoints ℝ {w,y} = spanPoints ℝ {x,z} := by
+      intro h
+      have h' := congrArg (fun S : AffineSubspace ℝ R4 => (S : Set R4)) h
+      simpa [coe_affineSpan] using h'
+    apply this at hAffinesEqual
+    have hSetsEqual : (affineSpan ℝ {w, y} : Set R4) = (affineSpan ℝ {x,z} : Set R4) := by
+      rw [coe_affineSpan]
+      rw [coe_affineSpan]
+      rw [hAffinesEqual]
+    have : y ∈ ({w,y} : Set R4) := by simp
+    have hyInwy := mem_spanPoints ℝ y {w,y} this
+    have : y ∈ (affineSpan ℝ {x,z} : Set R4) := by
+      rw[coe_affineSpan]
+      rw [← hAffinesEqual]
+      assumption
+
+    have hynInxz : y ∉ spanPoints ℝ ({x,z}: Set R4) := sorry
+
+    contradiction
+
+
+
+
 
 
 
