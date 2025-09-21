@@ -159,3 +159,6 @@ theorem lightLikeSpan : ∀ (x y z : R4), lightLike x z → y ∈ affineSpan ℝ
       rw [this]
       ring
     rw [hxySpace, hxyTime, hllxz]
+
+theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
+  w ∈ affineSpan ℝ {x, z} := sorry

@@ -3,10 +3,6 @@ open scoped RealInnerProductSpace
 open EuclideanSpace
 
 #check dist_add_dist_eq_iff
-#check AffineSubspace.affineSpan_parallel_iff_vectorSpan_eq_and_eq_empty_iff_eq_empty
-#check AffineSubspace.ext_of_direction_eq
-#check AffineSubspace.eq_iff_direction_eq_of_mem
-#check AffineSubspace.ext_of_direction_eq
 
 theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
   ∃ (z : R4), lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
@@ -23,9 +19,7 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     push_neg at hw
     obtain ⟨w,⟨hllwx, hllwy, hllwz⟩ ⟩ := hw
     have hwxyz := hparallel w y
-
-    have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := sorry
-
+    have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := lightLikeSpan' x z w hllxz hllwx hllwz
     have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := by
       have : {w,y}  ⊆ ((affineSpan ℝ {x, y, z}) : Set R4) := by
         simp only [Set.insert_subset_iff]
