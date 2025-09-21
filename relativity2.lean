@@ -25,8 +25,8 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     have hwxyz := hparallel w y
 
     have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := sorry
-    have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := by
 
+    have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := by
       have : {w,y}  ⊆ ((affineSpan ℝ {x, y, z}) : Set R4) := by
         simp only [Set.insert_subset_iff]
         constructor
@@ -47,8 +47,7 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
           apply mem_affineSpan ℝ this
 
         simpa [Set.singleton_subset_iff] using hy_mem
-
-
+      exact affineSpan_le.mpr this
 
 
     have hAffineParallel := hwxyz haffineSub hllwy
