@@ -41,18 +41,13 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
           · simp [Set.mem_insert_iff, Set.mem_singleton_iff]
           · simp [Set.mem_insert_iff, Set.mem_singleton_iff]
         exact hle hwInxzSpan
-
         have hy_mem : y ∈ (affineSpan ℝ {x, y, z}) := by
           have : y ∈ ({x,y,z} : Set R4) := by simp
           apply mem_affineSpan ℝ this
-
         simpa [Set.singleton_subset_iff] using hy_mem
       exact affineSpan_le.mpr this
-
-
     have hAffineParallel := hwxyz haffineSub hllwy
     apply AffineSubspace.Parallel.direction_eq at hAffineParallel
-
     have hn : ((affineSpan ℝ {w, y} : Set R4) ∩ (affineSpan ℝ {x, z} : Set R4)).Nonempty := by
       use w
       constructor
@@ -76,19 +71,13 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
       rw[coe_affineSpan]
       rw [← hAffinesEqual]
       assumption
-
-    have hynInxz : y ∉ spanPoints ℝ ({x,z}: Set R4) := sorry
-
+    have hynInxz : y ∉ spanPoints ℝ ({x,z}: Set R4) := by
+      intro hyInSpanxz
+      have hllxy := lightLikeSpan x y z hllxz hyInSpanxz
+      unfold lightLike at hllxy
+      rw [hllxy] at hsdgttd
+      linarith
     contradiction
-
-
-
-
-
-
-
-
-
 
 theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
   → lightLike x z → ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
