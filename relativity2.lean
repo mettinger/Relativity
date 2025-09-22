@@ -7,8 +7,39 @@ open EuclideanSpace
 theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
   ∃ (z : R4), lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
 
+lemma  lightLikeSpanEq : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
+  (x 3 = z 3 ∨ x 3 = w 3 ∨ z 3 = w 3) → w ∈ affineSpan ℝ {x, z} := sorry
+
+lemma  lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
+  (x 3 < z 3 ∧ z 3 < w 3) → w ∈ affineSpan ℝ {x, z} := sorry
+
 theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
-  w ∈ affineSpan ℝ {x, z} := sorry
+  w ∈ affineSpan ℝ {x, z} := by
+    intro x z w hllxz hllwx hllwz
+    by_cases hxz : x 3 ≤ z 3
+    by_cases hzw : z 3 ≤ w 3
+    apply le_iff_eq_or_lt.mp at hxz
+    apply le_iff_eq_or_lt.mp at hzw
+    obtain h1|h2 := hxz
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
+    obtain h3|h4 := hzw
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inr h3))
+    sorry
+    apply le_iff_eq_or_lt.mp at hxz
+    obtain h1|h2 := hxz
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
+    apply not_le.mp at hzw
+    sorry
+    apply not_le.mp at hxz
+    by_cases hwx : w 3 ≤ x 3
+    apply le_iff_eq_or_lt.mp at hwx
+    obtain h1|h2 := hwx
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inl h1.symm))
+    sorry
+    apply not_le.mp at hwx
+    sorry
+
+
 
 theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
   lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
