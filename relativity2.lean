@@ -11,7 +11,8 @@ lemma  lightLikeSpanEq : ∀ (x z w: R4), lightLike x z → lightLike w x → li
   (x 3 = z 3 ∨ x 3 = w 3 ∨ z 3 = w 3) → w ∈ affineSpan ℝ {x, z} := sorry
 
 lemma  lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
-  (x 3 < z 3 ∧ z 3 < w 3) → w ∈ affineSpan ℝ {x, z} := sorry
+  (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
+  w ∈ affineSpan ℝ {x, z} := sorry
 
 theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
   w ∈ affineSpan ℝ {x, z} := by
@@ -24,22 +25,35 @@ theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → li
     exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
     obtain h3|h4 := hzw
     exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inr h3))
-    sorry
+    exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inl (And.intro h2 h4))
     apply le_iff_eq_or_lt.mp at hxz
     obtain h1|h2 := hxz
     exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
     apply not_le.mp at hzw
-    sorry
+    by_cases hxw : x 3 ≤ w 3
+    apply le_iff_eq_or_lt.mp at hxw
+    obtain h1|h2 := hxw
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inl h1))
+    exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inr (Or.inl (And.intro h2 hzw)))
+    apply not_le.mp at hxw
+    exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inr (Or.inr (And.intro hxw h2)))
     apply not_le.mp at hxz
     by_cases hwx : w 3 ≤ x 3
     apply le_iff_eq_or_lt.mp at hwx
     obtain h1|h2 := hwx
     exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inl h1.symm))
-    sorry
+    by_cases hzw : z 3 ≤ w 3
+    apply le_iff_eq_or_lt.mp at hzw
+    obtain h1|h3 := hzw
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inr h1))
+    have := lightLikeSpanLt z x w (lightLikeSymm x z hllxz) hllwz hllwx (Or.inr (Or.inl (And.intro h3 h2)))
+    simpa [Set.pair_comm] using this
+    apply not_le.mp at hzw
+    have := lightLikeSpanLt z x w (lightLikeSymm x z hllxz) hllwz hllwx (Or.inr (Or.inr (And.intro hzw hxz)))
+    simpa [Set.pair_comm] using this
     apply not_le.mp at hwx
-    sorry
-
-
+    have := lightLikeSpanLt z x w (lightLikeSymm x z hllxz) hllwz hllwx (Or.inl (And.intro hxz hwx))
+    simpa [Set.pair_comm] using this
 
 theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
   lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
