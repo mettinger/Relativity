@@ -5,7 +5,7 @@ open EuclideanSpace
 #check dist_add_dist_eq_iff
 
 theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
-  ∃ (z : R4), lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
+  ∃ (z : R4), x ≠ z ∧ lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
 
 lemma  lightLikeSpanEq : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
   (x 3 = z 3 ∨ x 3 = w 3 ∨ z 3 = w 3) → w ∈ affineSpan ℝ {x, z} := sorry
@@ -14,9 +14,9 @@ lemma  lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → li
   (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
   w ∈ affineSpan ℝ {x, z} := sorry
 
-theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
+theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z → x ≠ z →
   w ∈ affineSpan ℝ {x, z} := by
-    intro x z w hllxz hllwx hllwz
+    intro x z w hllxz hllwx hllwz hxnez
     by_cases hxz : x 3 ≤ z 3
     by_cases hzw : z 3 ≤ w 3
     apply le_iff_eq_or_lt.mp at hxz
@@ -59,7 +59,7 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
   lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
     intro x y hsdgttd
     have := tangentPlaneToCone x y hsdgttd
-    obtain ⟨z, ⟨hllxz, hparallel⟩⟩  := this
+    obtain ⟨z, ⟨hxnez, hllxz, hparallel⟩⟩  := this
     use z
     constructor
     exact hllxz
@@ -67,7 +67,7 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
     push_neg at hw
     obtain ⟨w,⟨hllwx, hllwy, hllwz⟩ ⟩ := hw
     have hwxyz := hparallel w y
-    have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := lightLikeSpan' x z w hllxz hllwx hllwz
+    have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := lightLikeSpan' x z w hllxz hllwx hllwz hxnez
     have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := by
       have : {w,y}  ⊆ ((affineSpan ℝ {x, y, z}) : Set R4) := by
         simp only [Set.insert_subset_iff]
