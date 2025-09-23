@@ -14,7 +14,17 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
   (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
   w ∈ affineSpan ℝ {x, z} := sorry
 
-lemma lightLikeEq : ∀ (x y : R4), lightLike x y → x 3 = y 3 → x = y := sorry
+lemma lightLikeEq : ∀ (x y : R4), lightLike x y → x 3 = y 3 → x = y := by
+  intro x y hllxy hx3eqy3
+  unfold lightLike at hllxy
+  have htdzero : timeDistanceSq x y = 0 := by
+    unfold timeDistanceSq
+    rw [hx3eqy3]
+    simp
+  have hsdzero : spaceDistanceSq x y = 0 := by
+    rw [htdzero] at hllxy
+    assumption
+  exact sp_tm_eq_eq x y hsdzero hx3eqy3
 
 theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z → x ≠ z →
   w ∈ affineSpan ℝ {x, z} := by
