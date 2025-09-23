@@ -7,12 +7,14 @@ open EuclideanSpace
 theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
   ∃ (z : R4), x ≠ z ∧ lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
 
-lemma  lightLikeSpanEq : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
-  (x 3 = z 3 ∨ x 3 = w 3 ∨ z 3 = w 3) → w ∈ affineSpan ℝ {x, z} := sorry
+lemma lightLikeSpanEq : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
+  (x 3 = w 3 ∨ z 3 = w 3) → w ∈ affineSpan ℝ {x, z} := sorry
 
-lemma  lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
+lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
   (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
   w ∈ affineSpan ℝ {x, z} := sorry
+
+lemma lightLikeEq : ∀ (x y : R4), lightLike x y → x 3 = y 3 → x = y := sorry
 
 theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z → x ≠ z →
   w ∈ affineSpan ℝ {x, z} := by
@@ -22,18 +24,20 @@ theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → li
     apply le_iff_eq_or_lt.mp at hxz
     apply le_iff_eq_or_lt.mp at hzw
     obtain h1|h2 := hxz
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
+    have := lightLikeEq x z hllxz h1
+    contradiction
     obtain h3|h4 := hzw
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inr h3))
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr h3)
     exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inl (And.intro h2 h4))
     apply le_iff_eq_or_lt.mp at hxz
     obtain h1|h2 := hxz
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
+    have := lightLikeEq x z hllxz h1
+    contradiction
     apply not_le.mp at hzw
     by_cases hxw : x 3 ≤ w 3
     apply le_iff_eq_or_lt.mp at hxw
     obtain h1|h2 := hxw
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inl h1))
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
     exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inr (Or.inl (And.intro h2 hzw)))
     apply not_le.mp at hxw
     exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inr (Or.inr (And.intro hxw h2)))
@@ -41,11 +45,11 @@ theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → li
     by_cases hwx : w 3 ≤ x 3
     apply le_iff_eq_or_lt.mp at hwx
     obtain h1|h2 := hwx
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inl h1.symm))
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1.symm)
     by_cases hzw : z 3 ≤ w 3
     apply le_iff_eq_or_lt.mp at hzw
     obtain h1|h3 := hzw
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr (Or.inr h1))
+    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr h1)
     have := lightLikeSpanLt z x w (lightLikeSymm x z hllxz) hllwz hllwx (Or.inr (Or.inl (And.intro h3 h2)))
     simpa [Set.pair_comm] using this
     apply not_le.mp at hzw
