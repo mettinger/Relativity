@@ -31,7 +31,14 @@ lemma lightLikeSpanEq : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
 
 lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
   (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
-  w ∈ affineSpan ℝ {x, z} := sorry
+  w ∈ affineSpan ℝ {x, z} := by
+    intro x z w hllxz hllwx hllwz h
+    obtain hxzw|hxwz|hwxz := h
+    sorry
+    sorry
+    have : z 3 - w 3 = (z 3 - x 3) + (x 3 - w 3) := by simp
+    sorry
+
 
 
 
