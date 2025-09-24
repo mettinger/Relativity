@@ -4,7 +4,6 @@ open EuclideanSpace
 
 #check dist_add_dist_eq_iff
 #check Wbtw.mem_affineSpan
-#check Wbtw.left_mem_affineSpan_of_right_ne
 
 lemma lightLikeEq : ∀ (x y : R4), lightLike x y → x 3 = y 3 → x = y := by
   intro x y hllxy hx3eqy3
@@ -36,6 +35,19 @@ lemma sqrtTimeDistance : ∀ (x y : R4), √ (timeDistanceSq x y) = abs (x 3 - y
   unfold timeDistanceSq
   simpa using (Real.sqrt_sq_eq_abs (x 3 - y 3))
 
+lemma sqrtSpaceDistance : ∀ (x y : R4), √ (spaceDistanceSq x y) = dist (spatial x) (spatial y) := by
+  intro x y
+  unfold spaceDistanceSq
+  unfold spaceNormSq
+  unfold spatial
+  simp
+  sorry
+
+
+
+
+
+
 
 lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
   (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
@@ -50,10 +62,31 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
     have hzx  : 0 < z 3 - x 3 := sub_pos.mpr h2
     have hxw  : 0 < x 3 - w 3 := sub_pos.mpr h1
     have : abs (z 3 - w 3) = abs (z 3 - x 3) + abs (x 3 - w 3) := by
-      simpa [abs_of_pos hzwt, abs_of_pos hzx, abs_of_pos hxw] using this
+      simp [abs_of_pos hzwt, abs_of_pos hzx, abs_of_pos hxw]
     rw [← sqrtTimeDistance z w, ← sqrtTimeDistance z x, ← sqrtTimeDistance x w] at this
     unfold lightLike at *
     rw [timeDistanceComm z w, ← hllwz, timeDistanceComm z x, ← hllxz, timeDistanceComm x w, ← hllwx] at this
+    rw [sqrtSpaceDistance w z, sqrtSpaceDistance x z, sqrtSpaceDistance w x] at this
+    rw [← add_comm (dist (spatial w) (spatial x)) (dist (spatial x) (spatial z))] at this
+    have := Eq.symm this
+    have := dist_add_dist_eq_iff.mp this
+    have hspznespx : spatial z ≠ spatial x := by
+      have : timeDistanceSq z x > 0 := by
+        unfold timeDistanceSq
+        exact sq_pos_of_pos hzx
+      rw [timeDistanceComm z x] at this
+      rw [← hllxz] at this
+      unfold spaceDistanceSq at this
+      simp
+      intro hspeq
+      rw [hspeq] at this
+      simp at this
+      unfold spaceNormSq at this
+      simp_all
+    have hspatialAffine := Wbtw.left_mem_affineSpan_of_right_ne this hspznespx
+    sorry
+
+
 
 
 
