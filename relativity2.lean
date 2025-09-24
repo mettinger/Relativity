@@ -3,6 +3,8 @@ open scoped RealInnerProductSpace
 open EuclideanSpace
 
 #check dist_add_dist_eq_iff
+#check Wbtw.mem_affineSpan
+#check Wbtw.left_mem_affineSpan_of_right_ne
 
 lemma lightLikeEq : ∀ (x y : R4), lightLike x y → x 3 = y 3 → x = y := by
   intro x y hllxy hx3eqy3
@@ -29,6 +31,12 @@ lemma lightLikeSpanEq : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
     have : w ∈ ({x,w} : Set R4) := by simp
     exact mem_affineSpan ℝ this
 
+lemma sqrtTimeDistance : ∀ (x y : R4), √ (timeDistanceSq x y) = abs (x 3 - y 3) := by
+  intro x y
+  unfold timeDistanceSq
+  simpa using (Real.sqrt_sq_eq_abs (x 3 - y 3))
+
+
 lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
   (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
   w ∈ affineSpan ℝ {x, z} := by
@@ -36,8 +44,24 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
     obtain hxzw|hxwz|hwxz := h
     sorry
     sorry
+    obtain ⟨h1,h2⟩ := hwxz
     have : z 3 - w 3 = (z 3 - x 3) + (x 3 - w 3) := by simp
-    sorry
+    have hzwt : 0 < z 3 - w 3 := sub_pos.mpr (lt_trans h1 h2)
+    have hzx  : 0 < z 3 - x 3 := sub_pos.mpr h2
+    have hxw  : 0 < x 3 - w 3 := sub_pos.mpr h1
+    have : abs (z 3 - w 3) = abs (z 3 - x 3) + abs (x 3 - w 3) := by
+      simpa [abs_of_pos hzwt, abs_of_pos hzx, abs_of_pos hxw] using this
+    rw [← sqrtTimeDistance z w, ← sqrtTimeDistance z x, ← sqrtTimeDistance x w] at this
+    unfold lightLike at *
+    rw [timeDistanceComm z w, ← hllwz, timeDistanceComm z x, ← hllxz, timeDistanceComm x w, ← hllwx] at this
+
+
+
+
+
+
+
+
 
 
 
