@@ -4,6 +4,36 @@ open EuclideanSpace
 
 #check dist_add_dist_eq_iff
 #check Wbtw.mem_affineSpan
+#check vadd_left_mem_affineSpan_pair
+#check mem_vectorSpan_pair
+#check AffineSubspace.smul_vsub_vadd_mem
+
+abbrev R2 := EuclideanSpace ℝ (Fin 2)
+noncomputable def slopeVec (v : R2) : ℝ := v 1 / v 0
+
+lemma slopeVec_mul_eq_neg_one_of_perp
+  {v w : R2} (hvx : v 0 ≠ 0) (hwx : w 0 ≠ 0) (hperp : ⟪v, w⟫ = 0) : slopeVec v * slopeVec w = -1 := by
+    classical
+    have hsum' : ∑ i : Fin 2, v i * w i = 0 := by
+      rw [PiLp.inner_apply v w] at hperp
+      simp
+      simp at hperp
+      rw [mul_comm] at hperp
+      rw [mul_comm (w 1) (v 1)] at hperp
+      exact hperp
+    have hsum : v 0 * w 0 + v 1 * w 1 = 0 := by
+      simpa [Fin.sum_univ_two] using hsum'
+    have hv1w1 : v 1 * w 1 = -(v 0 * w 0) :=
+      eq_neg_of_add_eq_zero_right hsum
+    have hden_ne : v 0 * w 0 ≠ 0 := mul_ne_zero hvx hwx
+    calc
+      slopeVec v * slopeVec w
+          = (v 1 / v 0) * (w 1 / w 0) := rfl
+      _ = (v 1 * w 1) / (v 0 * w 0) := by
+        ring
+      _ = (-(v 0 * w 0)) / (v 0 * w 0) := by simp [hv1w1]
+      _ = -((v 0 * w 0) / (v 0 * w 0)) := by simp [neg_div]
+      _ = -1 := by simp [hden_ne]
 
 lemma lightLikeEq : ∀ (x y : R4), lightLike x y → x 3 = y 3 → x = y := by
   intro x y hllxy hx3eqy3
@@ -84,7 +114,10 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
       unfold spaceNormSq at this
       simp_all
     have hspatialAffine := Wbtw.left_mem_affineSpan_of_right_ne this hspznespx
-    sorry
+    #check vadd_left_mem_affineSpan_pair
+
+
+
 
 
 
@@ -238,7 +271,7 @@ theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
       exact (lightLikeSymm z w) (lightLikeSpan z w x ((lightLikeSymm x z) lightLikexz) this)
     case h.right.left := by
       unfold lightLike
-      sorry
+
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > timeDistanceSq x y := by
