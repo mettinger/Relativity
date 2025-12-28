@@ -1,6 +1,9 @@
 import Relativity.lemmas2
+
 open scoped RealInnerProductSpace
 open EuclideanSpace
+
+
 
 #check dist_add_dist_eq_iff
 #check Wbtw.mem_affineSpan
@@ -115,6 +118,9 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
       simp_all
     have hspatialAffine := Wbtw.left_mem_affineSpan_of_right_ne this hspznespx
     #check vadd_left_mem_affineSpan_pair
+    sorry
+
+
 
 
 
@@ -271,7 +277,7 @@ theorem wExist : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0]
       exact (lightLikeSymm z w) (lightLikeSpan z w x ((lightLikeSymm x z) lightLikexz) this)
     case h.right.left := by
       unfold lightLike
-
+      sorry
 
 theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ IOb m ∧ IOb k →
   ¬ spaceDistanceSq x y > timeDistanceSq x y := by
@@ -321,3 +327,36 @@ theorem notFasterThanLight : ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y 
         case right := lightLikeImplightLike w' z' w z k m iok iom hllw'z' hwEvents hz'.symm
     have hwNot := hwNotExist w
     contradiction
+
+
+
+
+noncomputable def T_of_vw
+    (v w : R4) (a b c d : ℝ)
+    (b4 : Module.Basis (Fin 4) ℝ R4)
+    (hv : b4 0 = v) (hw : b4 1 = w) : R4 →ₗ[ℝ] R2 :=
+  b4.constr ℝ ![![a, b], ![c, d], 0, 0]
+
+@[simp] lemma T_of_vw_on_v
+    (v w : R4) (a b c d : ℝ)
+    (b4 : Module.Basis (Fin 4) ℝ R4)
+    (hv : b4 0 = v) (hw : b4 1 = w) :
+    T_of_vw v w a b c d b4 hv hw v = ![a, b] := by
+  classical
+  have := (b4.constr_basis ℝ ![![a, b], ![c, d], 0, 0] 0)
+  simpa [T_of_vw, hv]
+
+@[simp] lemma T_of_vw_on_w
+    (v w : R4) (a b c d : ℝ)
+    (b4 : Module.Basis (Fin 4) ℝ R4)
+    (hv : b4 0 = v) (hw : b4 1 = w) :
+    T_of_vw v w a b c d b4 hv hw w = ![c, d] := by
+  classical
+  have := (b4.constr_basis ℝ ![![a, b], ![c, d], 0, 0] 1)
+  simpa [T_of_vw, hw]
+
+
+theorem orthoProjection : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] →
+  let dir := affineSpan ℝ ({x, z} : Set R4);
+  let w := EuclideanGeometry.orthogonalProjection dir (y - x);
+  (timeDistanceSq y w) * (spaceDistanceSq x w) = (timeDistanceSq x w) * (spaceDistanceSq y w) := by sorry
