@@ -1,4 +1,5 @@
 import Mathlib
+import Mathlib.Analysis.InnerProductSpace.PiL2
 --open scoped RealInnerProductSpace
 noncomputable section
 
@@ -7,12 +8,19 @@ abbrev R4 := EuclideanSpace ℝ (Fin 4)
 abbrev R3 := EuclideanSpace ℝ (Fin 3)
 
 -- project 4d point to its spatial components
+/--
 def spatial (p : R4) : R3 :=
-  fun x : Fin 3 =>
+  fun (x : Fin 3) =>
     match x with
     | 0 => p 0
     | 1 => p 1
     | 2 => p 2
+--/
+
+def spatial (p : R4) : R3 :=
+  -- Convert the raw function into the EuclideanSpace type
+  (WithLp.equiv 2 (Fin 3 → ℝ)).symm (fun x => p (Fin.castSucc x))
+
 
 -- compute the norm of a 3d point
 def spaceNormSq (p : R3) : ℝ := p 0 ^ 2 + p 1 ^ 2 + p 2 ^ 2
