@@ -47,7 +47,7 @@ axiom axph : ∀ (m : B), ∀ (x y : R4), IOb m →
   ((∃ (p : B), Ph p ∧ W m p x ∧ W m p y) ↔ (spaceDistanceSq x y = timeDistanceSq x y))
 
 -- END AXIOM
-
+#check axph
 -- AXIOM 2: "All inertial observers coordinatize the same set of events."
 axiom axev : ∀ (m k : B), IOb m → IOb k → ∀ (x : R4), ∃ (y : R4), events m x = events k y
 

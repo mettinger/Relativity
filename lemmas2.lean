@@ -15,9 +15,11 @@ theorem norm_sq_is_sum_of_squares : ∀ (v : R3), (v 0)^2 + (v 1)^2 + (v 2)^2 = 
   exact hcoords
 
 theorem spatialDiff : ∀ (x y : R4), spatial x - spatial y = ![x 0 - y 0, x 1 - y 1, x 2 - y 2] := by
-  intro x y
-  unfold spatial
-  aesop
+  intros x y
+  ext i
+  simp only [spatial];
+  fin_cases i <;> rfl
+
 theorem eventsToWorldview : ∀ (b ob : B), ∀ (x : R4), b ∈ events ob x ↔ W ob b x := by
   intro b ob x
   rw [events]
