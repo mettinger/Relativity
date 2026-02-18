@@ -12,13 +12,22 @@ theorem notLightSpeed : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
   W m k y ∧
   x ≠ y ∧
   IOb B IB W m ∧
-  IOb B IB W k → ¬ spaceDistanceSq x y = timeDistanceSq x y := by sorry
+  IOb B IB W k → ¬ spaceDistanceSq x y = timeDistanceSq x y := by
+    contrapose!;
+    rintro ⟨ m, k, x, y, h, h' ⟩;
+    intro h''; have := h''.right.right.right; simp_all +decide [ SpecRel, axsm ] ;
+    contrapose! this;
+    use m, m;
+    refine' ⟨ h.2.2.2.1, h.2.2.2.1, _ ⟩;
+    use 0, EuclideanSpace.single 0 1, 0, 0 ; norm_num [ events ];
+    unfold spaceDistanceSq; norm_num;
+    unfold spaceNormSq; norm_num [ spatial ] ;
+    norm_num [ Fin.ext_iff ]
 
-/-
+
 theorem notFasterThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
   W m k x ∧
   W m k y ∧
   x ≠ y ∧
   IOb B IB W m ∧
   IOb B IB W k → ¬ spaceDistanceSq x y = timeDistanceSq x y := by sorry
--/
