@@ -1,4 +1,4 @@
-import Harmonic.lemmas
+import Harmonic.definitions
 set_option relaxedAutoImplicit true
 -- Harmonic `generalize_proofs` tactic
 
