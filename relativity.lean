@@ -71,8 +71,6 @@ theorem slowerThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
     contrapose! h_axsm;
     unfold axsm; simp_all +decide [ Set.ext_iff ] ;
     refine' ⟨ m, h.2.2.2.1, m, h.2.2.2.1, _ ⟩;
-    -- Let's choose x to be the origin and x_1 to be a point with a non-zero spatial component but the same time component as x.
-
     use 0, EuclideanSpace.single 0 1;
     refine' ⟨ rfl, 0, EuclideanSpace.single 0 0, _, _, _, _ ⟩ <;> simp +decide [ spaceDistanceSq ];
     unfold spaceNormSq; norm_num [ Fin.sum_univ_succ ] ;
@@ -80,6 +78,14 @@ theorem slowerThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
     intro temp
     simp at *
 
+
+
+
+
+
+
+
+end
 /-
 theorem notLightSpeed : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
   W m k x ∧
