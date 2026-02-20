@@ -1,3 +1,5 @@
+--Co-authored-by: Aristotle (Harmonic) <aristotle-harmonic@harmonic.fun>
+
 import Mathlib
 --import Mathlib.Analysis.InnerProductSpace.PiL2
 noncomputable section
