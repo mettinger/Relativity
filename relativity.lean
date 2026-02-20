@@ -59,6 +59,11 @@ abbrev axsm := ∀ (m k : B), IOb B IB W m ∧ IOb B IB W k →
 
 abbrev SpecRel := axph B IB Ph W ∧ axev B IB W ∧ axsf B IB W ∧ axsm B IB W
 
+---------------------------------------------------------------
+
+
+-- Theorem: "In special relativity, no inertial observer can travel faster than the speed of light
+--           relative to another inertial observer."
 theorem slowerThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
   W m k x ∧
   W m k y ∧
@@ -66,19 +71,51 @@ theorem slowerThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
   IOb B IB W m ∧
   IOb B IB W k → spaceDistanceSq x y < timeDistanceSq x y := by
     intro h_spec_rel
-    obtain ⟨h_axph, h_axev, h_axsf, h_axsm⟩ := h_spec_rel;
-    intro m k x y h;
-    contrapose! h_axsm;
-    unfold axsm; simp_all +decide [ Set.ext_iff ] ;
-    refine' ⟨ m, h.2.2.2.1, m, h.2.2.2.1, _ ⟩;
-    use 0, EuclideanSpace.single 0 1;
-    refine' ⟨ rfl, 0, EuclideanSpace.single 0 0, _, _, _, _ ⟩ <;> simp +decide [ spaceDistanceSq ];
-    unfold spaceNormSq; norm_num [ Fin.sum_univ_succ ] ;
-    unfold spatial; norm_num;
+    obtain ⟨h_axph, h_axev, h_axsf, h_axsm⟩ := h_spec_rel
+    intro m k x y h
+    contrapose! h_axsm
+    unfold axsm;
+    simp_all +decide [ Set.ext_iff ]
+    refine' ⟨ m, h.2.2.2.1, m, h.2.2.2.1, _ ⟩
+    use 0, EuclideanSpace.single 0 1
+    refine' ⟨ rfl, 0, EuclideanSpace.single 0 0, _, _, _, _ ⟩ <;> simp +decide [ spaceDistanceSq ]
+    unfold spaceNormSq; norm_num [ Fin.sum_univ_succ ]
+    unfold spatial
+    norm_num
     intro temp
     simp at *
 
+----------------------------------------------------------
 
+
+-- "m sees k moving at velocity v"
+def velocitySq (m k : B) (v : ℝ) : Prop := ∀ (x y : R4), W m k x ∧ W m k y →
+  spaceDistanceSq x y = v * v * timeDistanceSq x y
+
+-- "m sees eventBody at time t"
+def time (m eventBody : B) (t : ℝ) : Prop := ∃ (x : R4), W m eventBody x ∧ x 3 = t
+
+-- Theorem: "In special relativity, different inertial observers may disagree on the temporal order of events"
+theorem temporalOrderParadox : SpecRel B IB Ph W → ∀ (m k : B) (v : ℝ),
+  IOb B IB W m ∧ IOb B IB W k ∧ velocitySq B W m k v ∧ v > 0 →
+  ∃ (b1 b2: B) (t1 t2 t3 t4: ℝ), time B W m b1 t1 ∧ time B W m b2 t2 ∧
+  time B W k b1 t3 ∧ time B W k b2 t4 ∧ t1 < t2 ∧ t4 < t3 := by
+    intros h_specRel m k v h_conditions
+    have h_contradiction : spaceDistanceSq (0 : R4)
+      (EuclideanSpace.single 0 1) < timeDistanceSq (0 : R4) (EuclideanSpace.single 0 1) := by
+      have := h_specRel.2.2.2; specialize this m m;
+      simp_all +decide [ Set.ext_iff ] ;
+      contrapose! this;
+      use 0, 0, 0, EuclideanSpace.single 0 1; simp_all +decide [ events ] ;
+      unfold spaceDistanceSq; norm_num [ spatial ] ;
+      unfold spaceNormSq; norm_num [ spatial ] ;
+      norm_num [ Fin.ext_iff ]
+    exfalso;
+    unfold spaceDistanceSq at h_contradiction; norm_num [ spatial ] at h_contradiction ;
+    unfold timeDistanceSq at h_contradiction; norm_num [ spatial ] at h_contradiction ;
+    unfold spaceNormSq at h_contradiction; norm_num [ spatial ] at h_contradiction ;
+    simp at h_contradiction;
+    linarith
 
 
 
