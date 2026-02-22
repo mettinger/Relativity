@@ -63,21 +63,48 @@ lemma sqrtTimeDistance : ∀ (x y : R4), √ (timeDistanceSq x y) = abs (x 3 - y
   unfold timeDistanceSq
   simpa using (Real.sqrt_sq_eq_abs (x 3 - y 3))
 
-lemma sqrtSpaceDistance : ∀ (x y : R4), √ (spaceDistanceSq x y) = dist (spatial x) (spatial y) := by sorry
-
-
-
-
-
-
+lemma sqrtSpaceDistance : ∀ (x y : R4), √ (spaceDistanceSq x y) = dist (spatial x) (spatial y) := by
+  have h_dist : ∀ (v w : R3), dist v w = Real.sqrt (v 0 ^ 2 + v 1 ^ 2 + v 2 ^ 2 + w 0 ^ 2 + w 1 ^ 2 + w 2 ^ 2 - 2 * (v 0 * w 0 + v 1 * w 1 + v 2 * w 2)) := by
+    intros v w
+    simp [dist_eq_norm, EuclideanSpace.norm_eq];
+    rw [ Fin.sum_univ_three ] ; ring;
+  intros x y
+  rw [h_dist];
+  unfold spaceDistanceSq; ring;
+  exact congrArg Real.sqrt ( by unfold spaceNormSq; norm_num [ spatial ] ; ring )
 
 lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
   (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
-  w ∈ affineSpan ℝ {x, z} := by sorry
+  w ∈ affineSpan ℝ {x, z} := by
+    intros x z w hxz hxw hwz h_order
+    have h_affine : w ∈ affineSpan ℝ {x, z} := by
+      have h_affine : ∃ (a b : ℝ), a + b = 1 ∧ w = a • x + b • z := by
+        obtain ⟨a, b, hab⟩ : ∃ a b : ℝ, w 3 = a * x 3 + b * z 3 ∧ a + b = 1 := by
+          use (w 3 - z 3) / (x 3 - z 3), 1 - (w 3 - z 3) / (x 3 - z 3);
+          grind;
+        have h_affine : (w 0 - a * x 0 - b * z 0)^2 + (w 1 - a * x 1 - b * z 1)^2 + (w 2 - a * x 2 - b * z 2)^2 = 0 := by
+          unfold lightLike at *;
+          unfold spaceDistanceSq timeDistanceSq at *;
+          unfold spaceNormSq at *; norm_num [ spatial ] at *;
+          grind;
+        exact ⟨ a, b, hab.2, by ext i; fin_cases i <;> norm_num <;> nlinarith! only [ h_affine, hab ] ⟩;
+      rcases h_affine with ⟨ a, b, hab, rfl ⟩ ; rw [ affineSpan ] ; simp +decide [ hab ] ;
+      simp +decide [ spanPoints ];
+      -- Since $a + b = 1$, we can rewrite $a • x + b • z$ as $a • (x - z) + z$.
+      have h_rewrite : a • x + b • z = a • (x - z) + z := by
+        rw [ show b = 1 - a by linarith ] ; ext ; norm_num ; ring;
+      simp +decide [ h_rewrite, vectorSpan_pair ];
+      exact Or.inr ⟨ a • ( x - z ), Submodule.smul_mem _ _ ( Submodule.subset_span ( Set.mem_singleton _ ) ), rfl ⟩
+    exact h_affine
 
-theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
-  ∃ (z : R4), x ≠ z ∧ lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
+theorem tangentPlaneToCone : SpecRel B IB Ph W → ∀ (x y : R4),
+  spaceDistanceSq x y > timeDistanceSq x y →
+  ∃ (z : R4), x ≠ z ∧
+  lightLike x z ∧
+  ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) →
+    lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := by sorry
 
+/-
 theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z → x ≠ z →
   w ∈ affineSpan ℝ {x, z} := by
     intro x z w hllxz hllwx hllwz hxnez
@@ -187,11 +214,72 @@ theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → �
       linarith
     contradiction
 
+noncomputable section AristotleLemmas
+
+/-
+Defines a helper function `mk_w` to construct a 4-vector from a spatial vector and a time component, and a lemma stating that its spatial component is the original vector.
+-/
+open scoped RealInnerProductSpace
+open EuclideanSpace
+
+def mk_w (v : R3) (t : ℝ) : R4 :=
+  (WithLp.equiv 2 (Fin 4 → ℝ)).symm ![v 0, v 1, v 2, t]
+
+@[simp]
+lemma spatial_mk_w (v : R3) (t : ℝ) : spatial (mk_w v t) = v := by
+  ext i; fin_cases i <;> rfl;
+
+/-
+Lemma stating that the time component of `mk_w v t` is `t`.
+-/
+@[simp]
+lemma time_mk_w (v : R3) (t : ℝ) : (mk_w v t) 3 = t := by
+  exact?
+
+/-
+Defines the witness point `w` for the theorem `wExist`.
+It sets the time component to the midpoint of `x` and `y`'s times.
+For the spatial component, it distinguishes two cases based on whether `x` and `z` are simultaneous.
+-/
+def w_witness (x y z : R4) : R4 :=
+  let t := (x 3 + y 3) / 2
+  if h : x 3 = z 3 then
+    mk_w ((WithLp.equiv 2 (Fin 3 → ℝ)).symm ![t - x 3, 0, 0]) t
+  else
+    let scale := (x 3 - t) / (x 3 - z 3)
+    mk_w (scale • spatial z) t
+
+/-
+Lemma stating that the witness point `w` constructed by `w_witness` is light-like separated from `x`, `y`, and `z`, under the given conditions.
+-/
+lemma w_witness_works (x y z : R4)
+  (hx : spatial x = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0])
+  (hy : spatial y = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0])
+  (hl : lightLike x z) :
+  lightLike (w_witness x y z) x ∧ lightLike (w_witness x y z) y ∧ lightLike (w_witness x y z) z := by
+    unfold lightLike at *;
+    unfold w_witness; simp_all +decide [ spaceDistanceSq, timeDistanceSq ] ;
+    split_ifs <;> simp_all +decide [ spaceNormSq, spatial ];
+    · unfold mk_w; simp +decide [ hx, hy, hl ] ; ring;
+      norm_num [ show z 0 = 0 by nlinarith, show z 1 = 0 by nlinarith, show z 2 = 0 by nlinarith ];
+    · unfold mk_w; simp +decide [ *, Fin.sum_univ_three ] ; ring;
+      grind
+
+end AristotleLemmas
+
 theorem wExist : ∀ (x y z : R4),
   spatial x = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] →
   spatial y = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] →
   lightLike x z →
-  ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by sorry
+  ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
+    intros x y z hx hy hl;
+    have := w_witness_works x y z hx hy hl;
+    exact ⟨ _, this ⟩
+
+-/
+
+
+
 
 /-
 noncomputable def T_of_vw
