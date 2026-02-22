@@ -54,16 +54,17 @@ abbrev axsm := ∀ (m k : B), IOb B IB W m ∧ IOb B IB W k →
                 ∀ (x y x' y' : R4), (x 3 = y 3) ∧
                                     (x' 3 = y' 3) ∧
                                     (events B W m x = events B W k x') ∧
-                                    (events B W m y = events B W k y) →
+                                    (events B W m y = events B W k y') →
                                     spaceDistanceSq x y = spaceDistanceSq x' y'
 
 -- END AXIOM
 
 abbrev SpecRel := axph B IB Ph W ∧ axev B IB W ∧ axsf B IB W ∧ axsm B IB W
 
----------------------------------------------------------------
 
 
+
+/-
 -- Theorem: "In special relativity, no inertial observer can travel faster than the speed of light
 --           relative to another inertial observer."
 theorem slowerThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
@@ -71,24 +72,9 @@ theorem slowerThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
   W m k y ∧
   x ≠ y ∧
   IOb B IB W m ∧
-  IOb B IB W k → spaceDistanceSq x y < timeDistanceSq x y := by
-    intro h_spec_rel
-    obtain ⟨h_axph, h_axev, h_axsf, h_axsm⟩ := h_spec_rel
-    intro m k x y h
-    contrapose! h_axsm
-    unfold axsm;
-    simp_all +decide [ Set.ext_iff ]
-    refine' ⟨ m, h.2.2.2.1, m, h.2.2.2.1, _ ⟩
-    use 0, EuclideanSpace.single 0 1
-    refine' ⟨ rfl, 0, EuclideanSpace.single 0 0, _, _, _, _ ⟩ <;> simp +decide [ spaceDistanceSq ]
-    unfold spaceNormSq; norm_num [ Fin.sum_univ_succ ]
-    unfold spatial
-    norm_num
-    intro temp
-    simp at *
+  IOb B IB W k → spaceDistanceSq x y < timeDistanceSq x y := by sorry
 
 ----------------------------------------------------------
-
 
 -- "m sees k moving at velocity v"
 def velocitySq (m k : B) (v : ℝ) : Prop := ∀ (x y : R4), W m k x ∧ W m k y →
@@ -154,3 +140,4 @@ theorem minkowskiMetricInvariant B IB Ph W : SpecRel B IB Ph W →
     · decide +revert;
     · unfold spaceNormSq; norm_num [ spatial ] ;
       norm_num [ Fin.ext_iff ]
+-/

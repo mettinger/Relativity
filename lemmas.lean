@@ -1,4 +1,4 @@
-import Harmonic.definitions
+import Relativity.definitions
 set_option relaxedAutoImplicit true
 -- Harmonic `generalize_proofs` tactic
 
