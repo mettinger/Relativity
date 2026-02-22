@@ -1,12 +1,39 @@
+/-
+This file was edited by Aristotle (https://aristotle.harmonic.fun).
+
+Lean version: leanprover/lean4:v4.24.0
+Mathlib version: f897ebcf72cd16f89ab4577d0c826cd14afaafc7
+This project request had uuid: 2159ce4f-c6ae-40f7-8cc3-1bb342f34784
+
+To cite Aristotle, tag @Aristotle-Harmonic on GitHub PRs/issues, and add as co-author to commits:
+Co-authored-by: Aristotle (Harmonic) <aristotle-harmonic@harmonic.fun>
+
+The following was proved by Aristotle:
+
+- theorem notLightSpeed : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧
+  IOb B IB W m ∧ IOb B IB W k → ¬ spaceDistanceSq x y = timeDistanceSq x y
+-/
+
 import Relativity.lemmas
 import Relativity.definitions
+
+
 set_option relaxedAutoImplicit true
+
 -- Harmonic `generalize_proofs` tactic
 
-variable (B : Type) -- Bodies
-variable (IB : B → Prop) -- Inertial bodies predicate
-variable (Ph : B → Prop) -- Photon predicate
-variable (W : B → B → R4 → Prop) -- Worldview predicate
+variable (B : Type)
+
+-- Bodies
+variable (IB : B → Prop)
+
+-- Inertial bodies predicate
+variable (Ph : B → Prop)
+
+-- Photon predicate
+variable (W : B → B → R4 → Prop)
+
+-- Worldview predicate
 
 theorem notLightSpeed : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧
   IOb B IB W m ∧ IOb B IB W k → ¬ spaceDistanceSq x y = timeDistanceSq x y := by
@@ -49,12 +76,27 @@ theorem notLightSpeed : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4), W m
       rw [eventsToWorldview B W]
       exact mkx
     have := axsf k iok x' this
+    -- Since $x' 0 = 0$, $x' 1 = 0$, and $x' 2 = 0$, we have $x's = (0, 0, 0)$.
     ext i; fin_cases i <;> simp [x's, this];
     · exact this.1;
     · exact this.2.1;
     · -- By definition of spatial, we have spatial x' 2 = x' 2.
       simp [spatial, this]
 
+  /-
+  have x'sZero : x's = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] := by
+    have  : W k k x' := by
+      rw [← eventsToWorldview B W]
+      rw [← EVmxeqkx']
+      rw [eventsToWorldview B W]
+      exact mkx
+    have := axsf k iok x' this
+    simp [x's]
+    unfold spatial
+    simp
+    simp [this]
+    aesop
+-/
   have y'sZero : y's = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] := by
     apply Classical.byContradiction
     intro hy's_nonzero;
