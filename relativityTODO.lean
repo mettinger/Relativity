@@ -17,8 +17,6 @@ theorem slowerThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4),
   IOb B IB W m ∧
   IOb B IB W k → spaceDistanceSq x y < timeDistanceSq x y := by sorry
 
-
-
 -- Theorem: "In special relativity, different inertial observers may disagree on the temporal order of events"
 theorem temporalOrderParadox : SpecRel B IB Ph W → ∀ (m k : B) (v : ℝ),
   IOb B IB W m ∧ IOb B IB W k ∧ velocitySq B W m k v ∧ v > 0 →

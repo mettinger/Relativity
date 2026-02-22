@@ -4,6 +4,7 @@ import Mathlib
 --import Mathlib.Analysis.InnerProductSpace.PiL2
 noncomputable section
 
+abbrev R2 := EuclideanSpace ℝ (Fin 2)
 abbrev R3 := EuclideanSpace ℝ (Fin 3)
 abbrev R4 := EuclideanSpace ℝ (Fin 4)
 
