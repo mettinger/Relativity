@@ -69,6 +69,8 @@ theorem notFasterThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4)
     have hwNot := hwNotExist w
     contradiction
 
+-- Theorem: "In special relativity, no inertial observer can travel at the speed of light
+--           relative to another inertial observer."
 theorem notLightSpeed : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4), W m k x ∧ W m k y ∧ x ≠ y ∧
   IOb B IB W m ∧ IOb B IB W k → ¬ spaceDistanceSq x y = timeDistanceSq x y := by
 
