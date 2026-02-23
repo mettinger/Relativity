@@ -153,7 +153,7 @@ theorem x_ne_y_evx_ne_evy : axph B IB Ph W → ∀ (x y : R4) (b : B), IOb B IB 
           unfold timeDistanceSq; ring;
       · simp_all +decide [ lightLike ];
         unfold spaceDistanceSq timeDistanceSq at h_light;
-        unfold spaceNormSq at h_light; simp_all +decide [ sub_eq_zero ] ;
+        unfold spaceNormSq at h_light; simp_all +decide;
         exact False.elim <| hxy <| by ext i; fin_cases i <;> nlinarith! only [ h_light, hxy', hxy'' ] ;
   exact hq.2.2 ( h_event_eq.subset hq.2.1 )
 

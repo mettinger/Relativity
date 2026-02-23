@@ -459,37 +459,3 @@ theorem wExist : ∀ (x y z : R4),
     intros x y z hx hy hl;
     have := w_witness_works x y z hx hy hl;
     exact ⟨ _, this ⟩
-
-
-
-/-
-noncomputable def T_of_vw
-    (v w : R4) (a b c d : ℝ)
-    (b4 : Module.Basis (Fin 4) ℝ R4)
-    (hv : b4 0 = v) (hw : b4 1 = w) : R4 →ₗ[ℝ] R2 :=
-  b4.constr ℝ ![![a, b], ![c, d], 0, 0]
-
-@[simp] lemma T_of_vw_on_v
-    (v w : R4) (a b c d : ℝ)
-    (b4 : Module.Basis (Fin 4) ℝ R4)
-    (hv : b4 0 = v) (hw : b4 1 = w) :
-    T_of_vw v w a b c d b4 hv hw v = ![a, b] := by
-  classical
-  have := (b4.constr_basis ℝ ![![a, b], ![c, d], 0, 0] 0)
-  simpa [T_of_vw, hv]
-
-@[simp] lemma T_of_vw_on_w
-    (v w : R4) (a b c d : ℝ)
-    (b4 : Module.Basis (Fin 4) ℝ R4)
-    (hv : b4 0 = v) (hw : b4 1 = w) :
-    T_of_vw v w a b c d b4 hv hw w = ![c, d] := by
-  classical
-  have := (b4.constr_basis ℝ ![![a, b], ![c, d], 0, 0] 1)
-  simpa [T_of_vw, hw]
-
-
-theorem orthoProjection : ∀ (x y z : R4), spatial x = ![0,0,0] → spatial y = ![0,0,0] →
-  let dir := affineSpan ℝ ({x, z} : Set R4);
-  let w := EuclideanGeometry.orthogonalProjection dir (y - x);
-  (timeDistanceSq y w) * (spaceDistanceSq x w) = (timeDistanceSq x w) * (spaceDistanceSq y w) := by sorry
--/
