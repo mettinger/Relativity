@@ -3,29 +3,19 @@ This file was edited by Aristotle (https://aristotle.harmonic.fun).
 
 Lean version: leanprover/lean4:v4.24.0
 Mathlib version: f897ebcf72cd16f89ab4577d0c826cd14afaafc7
-This project request had uuid: 94baffde-f48b-491c-8ae2-31e122bdf339
+This project request had uuid: 068ddf75-032b-45d1-aad1-7b56923c426a
 
 To cite Aristotle, tag @Aristotle-Harmonic on GitHub PRs/issues, and add as co-author to commits:
 Co-authored-by: Aristotle (Harmonic) <aristotle-harmonic@harmonic.fun>
 
-The following was proved by Aristotle:
-
-- lemma sqrtSpaceDistance : ∀ (x y : R4), √ (spaceDistanceSq x y) = dist (spatial x) (spatial y)
-
-- lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z →
-  (x 3 < z 3 ∧ z 3 < w 3) ∨ (x 3 < w 3 ∧ w 3 < z 3) ∨ (w 3 < x 3 ∧ x 3 < z 3) →
-  w ∈ affineSpan ℝ {x, z}
-
-- theorem wExist : ∀ (x y z : R4),
-  spatial x = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] →
-  spatial y = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] →
-  lightLike x z →
-  ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z
-
 The following was negated by Aristotle:
 
-- theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
-  ∃ (z : R4), x ≠ z ∧ lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4))
+- theorem tangentPlaneToCone : SpecRel B IB Ph W → ∀ (x y : R4),
+  spaceDistanceSq x y > timeDistanceSq x y →
+  ∃ (z : R4), x ≠ z ∧
+  lightLike x z ∧
+  ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) →
+    lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4))
 
 Here is the code for the `negate_state` tactic, used within these negations:
 
@@ -122,13 +112,10 @@ lemma sqrtTimeDistance : ∀ (x y : R4), √ (timeDistanceSq x y) = abs (x 3 - y
   simpa using (Real.sqrt_sq_eq_abs (x 3 - y 3))
 
 lemma sqrtSpaceDistance : ∀ (x y : R4), √ (spaceDistanceSq x y) = dist (spatial x) (spatial y) := by
-  -- By definition of Euclidean distance, we know that the distance between two points in R3 is the square root of the sum of the squares of their coordinate differences.
   have h_dist : ∀ (v w : R3), dist v w = Real.sqrt (v 0 ^ 2 + v 1 ^ 2 + v 2 ^ 2 + w 0 ^ 2 + w 1 ^ 2 + w 2 ^ 2 - 2 * (v 0 * w 0 + v 1 * w 1 + v 2 * w 2)) := by
-    -- By definition of Euclidean distance, we know that the distance between two points in R3 is the square root of the sum of the squares of their coordinate differences. This follows from the Pythagorean theorem.
     intros v w
     simp [dist_eq_norm, EuclideanSpace.norm_eq];
     rw [ Fin.sum_univ_three ] ; ring;
-  -- By definition of Euclidean distance, we know that the distance between two points in R3 is the square root of the sum of the squares of their coordinate differences. Therefore, the equality holds by definition.
   intros x y
   rw [h_dist];
   unfold spaceDistanceSq; ring;
@@ -139,10 +126,8 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
   w ∈ affineSpan ℝ {x, z} := by
     intros x z w hxz hxw hwz h_order
     have h_affine : w ∈ affineSpan ℝ {x, z} := by
-      -- By definition of affine span, if $w$ is a linear combination of $x$ and $z$, then $w$ lies on the line passing through $x$ and $z$.
       have h_affine : ∃ (a b : ℝ), a + b = 1 ∧ w = a • x + b • z := by
         obtain ⟨a, b, hab⟩ : ∃ a b : ℝ, w 3 = a * x 3 + b * z 3 ∧ a + b = 1 := by
-          -- By solving the system of equations $a + b = 1$ and $w 3 = a * x 3 + b * z 3$, we can find $a$ and $b$.
           use (w 3 - z 3) / (x 3 - z 3), 1 - (w 3 - z 3) / (x 3 - z 3);
           grind;
         have h_affine : (w 0 - a * x 0 - b * z 0)^2 + (w 1 - a * x 1 - b * z 1)^2 + (w 2 - a * x 2 - b * z 2)^2 = 0 := by
@@ -162,203 +147,145 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
 
 /- Aristotle found this block to be false. Here is a proof of the negation:
 
-
-
-theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
-  ∃ (z : R4), x ≠ z ∧ lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := by
-    -- Wait, there's a mistake. We can actually prove the opposite.
-    negate_state;
-    -- Proof starts here:
-    -- Consider the points $x = (0, 0, 0, 0)$ and $y = (1, 0, 0, 0)$.
-    use ![0, 0, 0, 0], ![1, 0, 0, 0];
-    -- Let's simplify the goal.
-    simp [spaceDistanceSq, timeDistanceSq];
-    -- Let's simplify the goal. We need to show that the spatial distance squared between the origin and the point (1, 0, 0, 0) is positive.
-    simp [spaceNormSq, spatial];
-    -- By definition of lightLike, we have that spaceDistanceSq ![0, 0, 0, 0] x = timeDistanceSq ![0, 0, 0, 0] x.
-    simp [lightLike, spaceDistanceSq, timeDistanceSq] at *;
-    intro x hx h;
-    refine' ⟨ x, x, _, _, _ ⟩ <;> norm_num;
-    · exact affineSpan_mono ℝ ( by aesop_cat );
-    · unfold spaceNormSq; norm_num;
-    · intro H;
-      have := H.direction_eq;
-      simp_all +decide [ direction_affineSpan ];
-      rw [ eq_comm, vectorSpan_pair ] at this;
-      simp_all +decide [ Submodule.span_singleton_eq_bot ];
-      exact hx ( sub_eq_zero.mp this ▸ rfl )
-
--/
-theorem tangentPlaneToCone : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y →
-  ∃ (z : R4), x ≠ z ∧ lightLike x z ∧ ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) → lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := sorry
-
-theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z → x ≠ z →
-  w ∈ affineSpan ℝ {x, z} := by
-    intro x z w hllxz hllwx hllwz hxnez
-    by_cases hxz : x 3 ≤ z 3
-    by_cases hzw : z 3 ≤ w 3
-    apply le_iff_eq_or_lt.mp at hxz
-    apply le_iff_eq_or_lt.mp at hzw
-    obtain h1|h2 := hxz
-    have := lightLikeEq x z hllxz h1
-    contradiction
-    obtain h3|h4 := hzw
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr h3)
-    exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inl (And.intro h2 h4))
-    apply le_iff_eq_or_lt.mp at hxz
-    obtain h1|h2 := hxz
-    have := lightLikeEq x z hllxz h1
-    contradiction
-    apply not_le.mp at hzw
-    by_cases hxw : x 3 ≤ w 3
-    apply le_iff_eq_or_lt.mp at hxw
-    obtain h1|h2 := hxw
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1)
-    exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inr (Or.inl (And.intro h2 hzw)))
-    apply not_le.mp at hxw
-    exact lightLikeSpanLt x z w hllxz hllwx hllwz (Or.inr (Or.inr (And.intro hxw h2)))
-    apply not_le.mp at hxz
-    by_cases hwx : w 3 ≤ x 3
-    apply le_iff_eq_or_lt.mp at hwx
-    obtain h1|h2 := hwx
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inl h1.symm)
-    by_cases hzw : z 3 ≤ w 3
-    apply le_iff_eq_or_lt.mp at hzw
-    obtain h1|h3 := hzw
-    exact lightLikeSpanEq x z w hllxz hllwx hllwz (Or.inr h1)
-    have := lightLikeSpanLt z x w (lightLikeSymm x z hllxz) hllwz hllwx (Or.inr (Or.inl (And.intro h3 h2)))
-    simpa [Set.pair_comm] using this
-    apply not_le.mp at hzw
-    have := lightLikeSpanLt z x w (lightLikeSymm x z hllxz) hllwz hllwx (Or.inr (Or.inr (And.intro hzw hxz)))
-    simpa [Set.pair_comm] using this
-    apply not_le.mp at hwx
-    have := lightLikeSpanLt z x w (lightLikeSymm x z hllxz) hllwz hllwx (Or.inl (And.intro hxz hwx))
-    simpa [Set.pair_comm] using this
-
-theorem zExist : ∀ (x y : R4), spaceDistanceSq x y > timeDistanceSq x y → ∃ (z : R4),
-  lightLike x z ∧ ∀ (w : R4), ¬ (lightLike w x ∧ lightLike w y ∧ lightLike w z) := by
-    intro x y hsdgttd
-    have := tangentPlaneToCone x y hsdgttd
-    obtain ⟨z, ⟨hxnez, hllxz, hparallel⟩⟩  := this
-    use z
-    constructor
-    exact hllxz
-    by_contra hw
-    push_neg at hw
-    obtain ⟨w,⟨hllwx, hllwy, hllwz⟩ ⟩ := hw
-    have hwxyz := hparallel w y
-    have hwInxzSpan: w ∈ affineSpan ℝ {x,z} := lightLikeSpan' x z w hllxz hllwx hllwz hxnez
-    have haffineSub: affineSpan ℝ {w, y} ≤ affineSpan ℝ {x, y, z} := by
-      have : {w,y}  ⊆ ((affineSpan ℝ {x, y, z}) : Set R4) := by
-        simp only [Set.insert_subset_iff]
-        constructor
-        have hle :
-            affineSpan ℝ ({x, z} : Set R4) ≤
-              affineSpan ℝ ({x, y, z} : Set R4) := by
-          apply affineSpan_mono
-          intro t ht
-          have hxz : t = x ∨ t = z := by
-            simpa [Set.mem_insert_iff, Set.mem_singleton_iff] using ht
-          rcases hxz with rfl | rfl
-          · simp [Set.mem_insert_iff, Set.mem_singleton_iff]
-          · simp [Set.mem_insert_iff, Set.mem_singleton_iff]
-        exact hle hwInxzSpan
-        have hy_mem : y ∈ (affineSpan ℝ {x, y, z}) := by
-          have : y ∈ ({x,y,z} : Set R4) := by simp
-          apply mem_affineSpan ℝ this
-        simpa [Set.singleton_subset_iff] using hy_mem
-      exact affineSpan_le.mpr this
-    have hAffineParallel := hwxyz haffineSub hllwy
-    apply AffineSubspace.Parallel.direction_eq at hAffineParallel
-    have hn : ((affineSpan ℝ {w, y} : Set R4) ∩ (affineSpan ℝ {x, z} : Set R4)).Nonempty := by
-      use w
-      constructor
-      have : w ∈ ({w,y} : Set R4) := by simp
-      have := mem_spanPoints ℝ w {w,y} this
-      assumption
-      assumption
-    have hAffinesEqual := AffineSubspace.ext_of_direction_eq hAffineParallel hn
-    have : affineSpan ℝ {w, y} = affineSpan ℝ {x, z} → spanPoints ℝ {w,y} = spanPoints ℝ {x,z} := by
-      intro h
-      have h' := congrArg (fun S : AffineSubspace ℝ R4 => (S : Set R4)) h
-      simpa [coe_affineSpan] using h'
-    apply this at hAffinesEqual
-    have hSetsEqual : (affineSpan ℝ {w, y} : Set R4) = (affineSpan ℝ {x,z} : Set R4) := by
-      rw [coe_affineSpan]
-      rw [coe_affineSpan]
-      rw [hAffinesEqual]
-    have : y ∈ ({w,y} : Set R4) := by simp
-    have hyInwy := mem_spanPoints ℝ y {w,y} this
-    have : y ∈ (affineSpan ℝ {x,z} : Set R4) := by
-      rw[coe_affineSpan]
-      rw [← hAffinesEqual]
-      assumption
-    have hynInxz : y ∉ spanPoints ℝ ({x,z}: Set R4) := by
-      intro hyInSpanxz
-      have hllxy := lightLikeSpan x y z hllxz hyInSpanxz
-      unfold lightLike at hllxy
-      rw [hllxy] at hsdgttd
-      linarith
-    contradiction
-
 noncomputable section AristotleLemmas
 
 /-
-Defines a helper function `mk_w` to construct a 4-vector from a spatial vector and a time component, and a lemma stating that its spatial component is the original vector.
+Given a spacelike vector u, there exists a non-zero lightlike vector v that is Minkowski-orthogonal to u.
 -/
 open scoped RealInnerProductSpace
 open EuclideanSpace
 
-def mk_w (v : R3) (t : ℝ) : R4 :=
-  (WithLp.equiv 2 (Fin 4 → ℝ)).symm ![v 0, v 1, v 2, t]
-
-@[simp]
-lemma spatial_mk_w (v : R3) (t : ℝ) : spatial (mk_w v t) = v := by
-  ext i; fin_cases i <;> rfl;
+lemma exists_lightlike_in_spacelike_perp (u : R4) (h : spaceNormSq (spatial u) > u 3 ^ 2) :
+  ∃ v : R4, v ≠ 0 ∧ spaceNormSq (spatial v) = v 3 ^ 2 ∧ ⟪spatial u, spatial v⟫ - u 3 * v 3 = 0 := by
+    -- Let $j = spatial u$.
+    set j := spatial u;
+    -- Let $v_s$ be a spatial vector such that $\|v_s\|^2 = 1$ and $\langle j, v_s \rangle = u_3$.
+    obtain ⟨v_s, hv_s⟩ : ∃ v_s : R3, ‖v_s‖ = 1 ∧ ⟪j, v_s⟫ = u 3 := by
+      -- Since $j$ is a spatial vector, we can find a unit vector $v_s$ in the direction of $j$ such that $\langle j, v_s \rangle = u_3$.
+      obtain ⟨v_s, hv_s⟩ : ∃ v_s : R3, ‖v_s‖ = 1 ∧ ⟪j, v_s⟫ = u 3 := by
+        have h_norm : ‖j‖ > abs (u 3) := by
+          simp_all +decide [ spaceNormSq, EuclideanSpace.norm_eq ];
+          exact Real.lt_sqrt_of_sq_lt ( by simpa [ Fin.sum_univ_three ] using h )
+        -- Since $j$ is a spatial vector, we can find a unit vector $v_s$ in the direction of $j$ such that $\langle j, v_s \rangle = u_3$. Use the fact that the unit sphere in $\mathbb{R}^3$ is connected.
+        have h_unit_sphere : IsConnected {v : R3 | ‖v‖ = 1} := by
+          have h_unit_sphere : IsConnected (Metric.sphere (0 : R3) 1) := by
+            apply_rules [ isConnected_sphere ];
+            · erw [ rank_pi ] ; norm_num;
+            · norm_num;
+          simpa only [ Metric.sphere, dist_zero_right ] using h_unit_sphere;
+        have h_intersect : ∃ v_s ∈ {v : R3 | ‖v‖ = 1}, ⟪j, v_s⟫ = u 3 := by
+          have h_continuous : ContinuousOn (fun v : R3 => ⟪j, v⟫) {v : R3 | ‖v‖ = 1} := by
+            fun_prop
+          have h_intersect : ∃ v_s ∈ {v : R3 | ‖v‖ = 1}, ⟪j, v_s⟫ ≥ u 3 ∧ ∃ v_s ∈ {v : R3 | ‖v‖ = 1}, ⟪j, v_s⟫ ≤ u 3 := by
+            refine' ⟨ ‖j‖⁻¹ • j, _, _, -‖j‖⁻¹ • j, _, _ ⟩ <;> norm_num [ norm_smul, abs_of_nonneg ];
+            · rw [ inv_mul_cancel₀ ( ne_of_gt ( lt_of_le_of_lt ( abs_nonneg _ ) h_norm ) ) ];
+            · norm_num [ inner_smul_right ];
+              rw [ inv_mul_eq_div, le_div_iff₀ ] <;> nlinarith [ abs_lt.mp h_norm, norm_nonneg j, norm_nonneg u, real_inner_self_eq_norm_sq j ];
+            · rw [ inv_mul_cancel₀ ( ne_of_gt ( lt_of_le_of_lt ( abs_nonneg _ ) h_norm ) ) ];
+            · simp_all +decide [ inner_smul_right, norm_smul ];
+              rw [ real_inner_self_eq_norm_sq ] ; nlinarith [ abs_lt.mp h_norm, mul_inv_cancel₀ ( ne_of_gt ( norm_pos_iff.mpr ( show j ≠ 0 from by contrapose! h_norm; aesop ) ) ) ];
+          have := h_unit_sphere.image _ h_continuous;
+          exact this.Icc_subset ( Set.mem_image_of_mem _ h_intersect.choose_spec.2.2.choose_spec.1 ) ( Set.mem_image_of_mem _ h_intersect.choose_spec.1 ) ⟨ h_intersect.choose_spec.2.2.choose_spec.2, h_intersect.choose_spec.2.1 ⟩;
+        exact h_intersect;
+      use v_s;
+    refine' ⟨ fun i => if hi : i.val < 3 then v_s ⟨ i.val, hi ⟩ else 1, _, _, _ ⟩ <;> simp_all +decide [ EuclideanSpace.norm_eq ];
+    · exact fun h => by have := congr_fun h 3; norm_num at this;
+    · unfold spaceNormSq; simp_all +decide [ Fin.sum_univ_three ] ;
+      exact hv_s.1;
+    · exact sub_eq_zero_of_eq hv_s.2
 
 /-
-Lemma stating that the time component of `mk_w v t` is `t`.
+In the plane spanned by a spacelike vector u and a Minkowski-orthogonal lightlike vector v, the only lightlike directions are parallel to v.
 -/
-@[simp]
-lemma time_mk_w (v : R3) (t : ℝ) : (mk_w v t) 3 = t := by
-  exact?
+open scoped RealInnerProductSpace
+open EuclideanSpace
+
+lemma lightlike_is_unique_in_spacelike_perp (u v : R4)
+  (hu : spaceNormSq (spatial u) > u 3 ^ 2)
+  (hv : spaceNormSq (spatial v) = v 3 ^ 2)
+  (hdot : ⟪spatial u, spatial v⟫ - u 3 * v 3 = 0) :
+  ∀ w : R4, w ∈ Submodule.span ℝ {u, v} → spaceNormSq (spatial w) = w 3 ^ 2 → w ∈ Submodule.span ℝ {v} := by
+    -- Let $w = a u + b v$.
+    intro w hw hw_lightlike
+    obtain ⟨a, b, hw_eq⟩ : ∃ (a b : ℝ), w = a • u + b • v := by
+      rw [ Submodule.mem_span_pair ] at hw ; tauto;
+    -- Substitute $w = a u + b v$ into the lightlike condition.
+    have h_sub : a^2 * (spaceNormSq (spatial u) - u 3^2) = 0 := by
+      simp_all +decide [ spatial, spaceNormSq ];
+      norm_num [ Fin.sum_univ_three, inner ] at hdot;
+      grind;
+    simp_all +decide [ ne_of_gt ];
+    exact Submodule.smul_mem _ _ ( Submodule.subset_span ( Set.mem_singleton _ ) )
 
 /-
-Defines the witness point `w` for the theorem `wExist`.
-It sets the time component to the midpoint of `x` and `y`'s times.
-For the spatial component, it distinguishes two cases based on whether `x` and `z` are simultaneous.
+A point is lightlike to itself.
 -/
-def w_witness (x y z : R4) : R4 :=
-  let t := (x 3 + y 3) / 2
-  if h : x 3 = z 3 then
-    mk_w ((WithLp.equiv 2 (Fin 3 → ℝ)).symm ![t - x 3, 0, 0]) t
-  else
-    let scale := (x 3 - t) / (x 3 - z 3)
-    mk_w (scale • spatial z) t
+open scoped RealInnerProductSpace
+open EuclideanSpace
+
+lemma lightLike_self (x : R4) : lightLike x x := by
+  unfold lightLike;
+  unfold spaceDistanceSq timeDistanceSq; norm_num;
+  unfold spaceNormSq; norm_num;
 
 /-
-Lemma stating that the witness point `w` constructed by `w_witness` is light-like separated from `x`, `y`, and `z`, under the given conditions.
+The affine span of {x, x} is the affine span of {x}.
 -/
-lemma w_witness_works (x y z : R4)
-  (hx : spatial x = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0])
-  (hy : spatial y = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0])
-  (hl : lightLike x z) :
-  lightLike (w_witness x y z) x ∧ lightLike (w_witness x y z) y ∧ lightLike (w_witness x y z) z := by
-    unfold lightLike at *;
-    unfold w_witness; simp_all +decide [ spaceDistanceSq, timeDistanceSq ] ;
-    split_ifs <;> simp_all +decide [ spaceNormSq, spatial ];
-    · unfold mk_w; simp +decide [ hx, hy, hl ] ; ring;
-      norm_num [ show z 0 = 0 by nlinarith, show z 1 = 0 by nlinarith, show z 2 = 0 by nlinarith ];
-    · unfold mk_w; simp +decide [ *, Fin.sum_univ_three ] ; ring;
-      grind
+open scoped RealInnerProductSpace
+open EuclideanSpace
+
+lemma affineSpan_singleton_eq (x : R4) : affineSpan ℝ ({x, x} : Set R4) = affineSpan ℝ {x} := by
+  norm_num +zetaDelta at *
+
+/-
+Checking the definition of AffineSubspace.Parallel
+-/
+#print AffineSubspace.Parallel
+
+/-
+A point is not parallel to a line (defined by two distinct points).
+-/
+open scoped RealInnerProductSpace
+open EuclideanSpace
+
+lemma point_not_parallel_line (x z : R4) (h : x ≠ z) : ¬ (affineSpan ℝ {x}).Parallel (affineSpan ℝ {x, z}) := by
+  simp +decide [ h, AffineSubspace.Parallel ];
+  intro y hy; have := congr_arg ( fun s => s.direction ) hy; norm_num [ direction_affineSpan ] at this;
+  simp_all +decide [ vectorSpan_pair ];
+  exact h ( sub_eq_zero.mp this )
 
 end AristotleLemmas
 
-theorem wExist : ∀ (x y z : R4),
-  spatial x = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] →
-  spatial y = (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![0,0,0] →
-  lightLike x z →
-  ∃ (w : R4), lightLike w x ∧ lightLike w y ∧ lightLike w z := by
-    intros x y z hx hy hl;
-    have := w_witness_works x y z hx hy hl;
-    exact ⟨ _, this ⟩
+theorem tangentPlaneToCone : SpecRel B IB Ph W → ∀ (x y : R4),
+  spaceDistanceSq x y > timeDistanceSq x y →
+  ∃ (z : R4), x ≠ z ∧
+  lightLike x z ∧
+  ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) →
+    lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := by
+      -- Wait, there's a mistake. We can actually prove the opposite.
+      negate_state;
+      -- Proof starts here:
+      unfold SpecRel;
+      use PEmpty;
+      refine' ⟨ _, _, _, _, _ ⟩ <;> norm_num [ IOb, events ];
+      · exact fun _ => True;
+      · exact fun _ => True;
+      · exact fun _ _ _ => False;
+      · refine' ⟨ 0, EuclideanSpace.single 0 1, _, _ ⟩ <;> norm_num [ timeDistanceSq, spaceDistanceSq ];
+        · norm_num [ Fin.ext_iff, spaceNormSq ];
+          unfold spatial; norm_num;
+          norm_num [ Fin.ext_iff ];
+        · intro x hx hx';
+          refine' ⟨ 0, 0, _, _, _ ⟩ <;> norm_num [ lightLike ] at *;
+          · exact affineSpan_mono ℝ ( by norm_num );
+          · unfold spaceDistanceSq timeDistanceSq; norm_num;
+            unfold spaceNormSq; norm_num;
+          · exact?
+
+-/
+theorem tangentPlaneToCone : SpecRel B IB Ph W → ∀ (x y : R4),
+  spaceDistanceSq x y > timeDistanceSq x y →
+  ∃ (z : R4), x ≠ z ∧
+  lightLike x z ∧
+  ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) →
+    lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := by sorry
