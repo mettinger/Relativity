@@ -1,5 +1,5 @@
---import Relativity.lemmas
---import Relativity.lemmas2
+import Relativity.lemmas
+import Relativity.lemmas2
 import Relativity.definitions
 noncomputable section
 
