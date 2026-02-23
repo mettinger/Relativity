@@ -21,7 +21,7 @@ The following was proved by Aristotle:
 import Relativity.lemmas
 import Relativity.definitions
 
-
+set_option maxHeartbeats 1000000
 noncomputable section
 
 open scoped RealInnerProductSpace

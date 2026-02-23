@@ -21,7 +21,7 @@ theorem notFasterThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4)
     have axev := specRel.right.left
     have axsf := specRel.right.right.left
     have axsm := specRel.right.right.right
-    have zwExist := zExist x y spaceDistGreater
+    have zwExist := zExist specRel x y spaceDistGreater
     obtain ⟨z, ⟨hxzLightlike, hwNotExist⟩⟩  := zwExist
     --obtain ⟨z, ⟨hxzLightlike, ⟨hnColxyz, hwNotExist⟩⟩⟩  := zwExist
     obtain ⟨x', hx'⟩ := axev m k iom iok x
