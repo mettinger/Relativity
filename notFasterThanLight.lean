@@ -38,7 +38,7 @@ theorem notFasterThanLight : SpecRel B IB Ph W → ∀ (m k : B), ∀ (x y : R4)
         rw [eventsToWorldview B W]
         exact hwmkx
       have := axsf k iok x' this
-      ext i; fin_cases i <;> simp [x's, this];
+      ext i; fin_cases i <;> simp [x's];
       · exact this.1;
       · exact this.2.1;
       · -- By definition of spatial, we have spatial x' 2 = x' 2.
