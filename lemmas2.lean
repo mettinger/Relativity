@@ -97,12 +97,54 @@ lemma lightLikeSpanLt : ∀ (x z w: R4), lightLike x z → lightLike w x → lig
       exact Or.inr ⟨ a • ( x - z ), Submodule.smul_mem _ _ ( Submodule.subset_span ( Set.mem_singleton _ ) ), rfl ⟩
     exact h_affine
 
+def minkowskiInner (x y : R4) : ℝ := x 3 * y 3 - ⟪spatial x, spatial y⟫
+
+lemma minkowskiInner_bilin (a b : ℝ) (x y z : R4) : minkowskiInner (a • x + b • y) z = a * minkowskiInner x z + b * minkowskiInner y z := by sorry
+
+/-
+For any non-zero vector v in R3, there exists a non-zero vector w orthogonal to v.
+-/
+lemma exists_orth_nonzero_of_nonzero (v : R3) (hv : v ≠ 0) : ∃ w : R3, w ≠ 0 ∧ ⟪v, w⟫ = 0 := by sorry
+
+/-
 theorem tangentPlaneToCone : SpecRel B IB Ph W → ∀ (x y : R4),
   spaceDistanceSq x y > timeDistanceSq x y →
   ∃ (z : R4), x ≠ z ∧
   lightLike x z ∧
-  ∀ (s t : R4), affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) →
+  ∀ (s t : R4), s ≠ t → affineSpan ℝ ({s,t} : Set R4) ≤  affineSpan ℝ ({x, y, z} : Set R4) →
     lightLike s t → (affineSpan ℝ ({s,t} : Set R4)).Parallel  (affineSpan ℝ ({x,z} : Set R4)) := by sorry
+    -/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /-
 theorem lightLikeSpan' : ∀ (x z w: R4), lightLike x z → lightLike w x → lightLike w z → x ≠ z →
